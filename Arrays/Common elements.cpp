@@ -46,28 +46,31 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int solve() {
-	int n;
-	cin >> n;
-	vi arr(n);
-	rep(i,0,n) cin >> arr[i];
+void solve() {
+	int n1, n2, n3;
+	cin >> n1 >> n2 >> n3;
+	vi A(n1), B(n2), C(n3);
+	rep(i, 0, n1) cin >> A[i];
+	rep(i, 0, n2) cin >> B[i];
+	rep(i, 0, n3) cin >> C[i];
 
-	int steps = 0;
-    int currMax = 0, currReach = 0;
-    
-    for(int i = 0; i < n - 1; i++) {
-        if(i + arr[i] > currMax)
-            currMax = arr[i] + i;
-        
-        if(i == currReach) {
-            steps++;
-            currReach = currMax;
+	vector<int> ans;
+    int i = 0, j = 0, k = 0;
+    while(i < n1 && j < n2 && k < n3) {
+        if(A[i] == B[j] && B[j] == C[k]) {
+            if(A[i] != A[i-1]) 
+                ans.push_back(A[i]);
+            i++; j++; k++;
         }
-        
-        if(arr[i] == 0 && i == currReach)
-            return -1;
+        else if(A[i] < B[j])
+            i++;
+        else if(B[j] < C[k])
+            j++;
+        else
+            k++;
     }
-    return steps;
+    rep(i, 0, ans.size())
+    	cout << ans[i] << " ";
 }
 
 int main() {
@@ -79,7 +82,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

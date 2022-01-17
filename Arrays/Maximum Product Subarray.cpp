@@ -46,30 +46,25 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int solve() {
+void solve() {
 	int n;
 	cin >> n;
 	vi arr(n);
-	rep(i,0,n) cin >> arr[i];
+	rep(i, 0, n) cin >> arr[i];
 
-	int steps = 0;
-    int currMax = 0, currReach = 0;
-    
-    for(int i = 0; i < n - 1; i++) {
-        if(i + arr[i] > currMax)
-            currMax = arr[i] + i;
+	ll maxProd = 1, minProd = 1, ans = INT_MIN;
+    rep(i, 0, n) {
+        if(arr[i] < 0)
+            swap(minProd, maxProd);
+       
+        maxProd = max(maxProd * arr[i], (ll)arr[i]);
+        minProd = min(minProd * arr[i], (ll)arr[i]);
         
-        if(i == currReach) {
-            steps++;
-            currReach = currMax;
-        }
-        
-        if(arr[i] == 0 && i == currReach)
-            return -1;
+        ans = max(ans, maxProd);
     }
-    return steps;
+    cout << ans;
 }
-
+ 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
@@ -79,7 +74,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

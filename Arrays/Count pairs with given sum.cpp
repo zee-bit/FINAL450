@@ -46,40 +46,53 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int solve() {
-	int n;
-	cin >> n;
+void solve() {
+	int n, k;
+	cin >> n >> k;
 	vi arr(n);
-	rep(i,0,n) cin >> arr[i];
+	rep(i, 0, n) cin >> arr[i];
 
-	int steps = 0;
-    int currMax = 0, currReach = 0;
+	unordered_map<int, int> mp;
+    for(int i = 0; i < n; i++) 
+        mp[arr[i]]++;
     
-    for(int i = 0; i < n - 1; i++) {
-        if(i + arr[i] > currMax)
-            currMax = arr[i] + i;
-        
-        if(i == currReach) {
-            steps++;
-            currReach = currMax;
+    int ans = 0;
+    for(int i = 0; i < n; i++) {
+        int t = k - arr[i];
+        if(mp.find(t) != mp.end()) {
+            if(t == arr[i])
+                ans += max(0, mp[t] - 1);
+            else
+                ans += max(0, mp[t]);
+            mp[arr[i]]--;
         }
-        
-        if(arr[i] == 0 && i == currReach)
-            return -1;
     }
-    return steps;
+    cout << ans;
+
+    // OR
+
+    unordered_map<int, int> mp;
+    for(int i = 0; i < n; i++) {
+    	int t = k - arr[i];
+    	
+    	if(mp.count(t))
+    		ans += mp[t];
+    	
+    	mp[arr[i]]++;
+    }
+    cout << ans;
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("../input.txt", "r", stdin);
-  		freopen("../output.txt", "w", stdout);
+  		freopen("input.txt", "r", stdin);
+  		freopen("output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	// cin >> t;
+	cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

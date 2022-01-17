@@ -46,28 +46,26 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int solve() {
-	int n;
-	cin >> n;
-	vi arr(n);
-	rep(i,0,n) cin >> arr[i];
+void solve() {
+	int N;
+	cin >> N;
+	vi arr(N);
+	rep(i, 0, N) cin >> arr[i];
 
-	int steps = 0;
-    int currMax = 0, currReach = 0;
-    
-    for(int i = 0; i < n - 1; i++) {
-        if(i + arr[i] > currMax)
-            currMax = arr[i] + i;
-        
-        if(i == currReach) {
-            steps++;
-            currReach = currMax;
-        }
-        
-        if(arr[i] == 0 && i == currReach)
-            return -1;
-    }
-    return steps;
+	int i = 0;
+	for(int j = 0; j < N; j++) {
+		if(arr[j] < 0) {
+			swap(arr[i], arr[j]);
+			i++;
+		}
+	}
+	int neg = 0, pos = i;
+	while(neg < pos && pos < N && arr[neg] < 0) {
+		swap(arr[neg], arr[pos]);
+		pos++;
+		neg += 2;
+	}
+	rep(i, 0, N) cout << arr[i] << " ";
 }
 
 int main() {
@@ -79,7 +77,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

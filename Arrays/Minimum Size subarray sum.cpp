@@ -46,28 +46,35 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int solve() {
-	int n;
-	cin >> n;
-	vi arr(n);
-	rep(i,0,n) cin >> arr[i];
+void solve() {
+	int N, k;
+	cin >> N >> k;
+	vi nums(N);
+	rep(i, 0, N) cin >> nums[i];
 
-	int steps = 0;
-    int currMax = 0, currReach = 0;
+	int start = 0, end = 0, sum = 0, ans = inf;
+	while(end < N) {
+		sum += nums[end];
+		while(sum > k) {
+			ans = min(ans, end - start + 1);
+			sum -= nums[start++];
+		}
+		end++;
+	}
+	cout << ans;
+
+	// OR, Binary Search
+	vector<int> sums(N + 1, 0);
+    for(int i = 1; i <= N; i++)
+        sums[i] = sums[i - 1] + nums[i - 1];
     
-    for(int i = 0; i < n - 1; i++) {
-        if(i + arr[i] > currMax)
-            currMax = arr[i] + i;
-        
-        if(i == currReach) {
-            steps++;
-            currReach = currMax;
-        }
-        
-        if(arr[i] == 0 && i == currReach)
-            return -1;
+    for(int i = 1; i <= N; i++) {
+        int to_find = sums[i - 1] + target;
+        auto pos = lower_bound(sums.begin(), sums.end(), to_find);
+        if(pos != sums.end())
+            ans = min(ans, static_cast<int>(pos - (sums.begin() + i - 1)));
     }
-    return steps;
+    cout << ans;
 }
 
 int main() {
@@ -79,7 +86,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

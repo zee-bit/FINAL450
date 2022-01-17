@@ -46,40 +46,72 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int solve() {
-	int n;
-	cin >> n;
-	vi arr(n);
-	rep(i,0,n) cin >> arr[i];
+// Binary Search approach. O(NlogN)
+int BS_approach(vi &arr) {
+	int N = arr.size();
 
-	int steps = 0;
-    int currMax = 0, currReach = 0;
-    
-    for(int i = 0; i < n - 1; i++) {
-        if(i + arr[i] > currMax)
-            currMax = arr[i] + i;
+	auto small_or_equal = [&](int ele) {
+		int cnt = 0;
+		for(int &num : arr) {
+			if(num <= ele)
+				cnt++;
+		}
+		return cnt;
+	};
+
+	int lo = 1, hi = N, mid, ans;
+	while(lo <= hi) {
+		mid = (lo + hi) / 2;
+		if(small_or_equal(mid) > mid) {
+			ans = mid;
+			hi = mid - 1;
+		}
+		else
+			lo = mid + 1;
+	}
+	return ans;
+}
+
+void solve() {
+	int N;
+	cin >> N;
+	vi nums(N);
+	rep(i,0,N) cin >> nums[i];
+
+	// METHOD-1: BS [O(NlogN)]
+	cout << BS_approach(nums);
+
+	// METHOD-2: Array as Hashmap [O(N)]
+	while(nums[0] != nums[nums[0]])
+		swap(nums[0], nums[nums[0]]);
+	cout << nums[0];
+
+	// METHOD-3: Floyd's Cycle detection [O(N)]
+	int slow = nums[0], fast = nums[nums[0]];
         
-        if(i == currReach) {
-            steps++;
-            currReach = currMax;
-        }
-        
-        if(arr[i] == 0 && i == currReach)
-            return -1;
+    while(slow != fast) {
+        slow = nums[slow];
+        fast = nums[nums[fast]];
     }
-    return steps;
+    
+    slow = 0;
+    while(slow != fast) {
+        slow = nums[slow];
+        fast = nums[fast];
+    }
+    return slow;
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("../input.txt", "r", stdin);
-  		freopen("../output.txt", "w", stdout);
+  		freopen("input.txt", "r", stdin);
+  		freopen("output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	// cin >> t;
+	cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

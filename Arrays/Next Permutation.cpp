@@ -46,40 +46,43 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int solve() {
-	int n;
-	cin >> n;
-	vi arr(n);
-	rep(i,0,n) cin >> arr[i];
+void solve() {
+	int N;
+	cin >> N;
+	vi nums(N);
+	rep(i, 0, N) cin >> nums[i];
 
-	int steps = 0;
-    int currMax = 0, currReach = 0;
-    
-    for(int i = 0; i < n - 1; i++) {
-        if(i + arr[i] > currMax)
-            currMax = arr[i] + i;
-        
-        if(i == currReach) {
-            steps++;
-            currReach = currMax;
+	int ix = -1, jx = -1;
+	for(int i = N-2; i >= 0; i--) {
+		if(nums[i] < nums[i + 1]) {
+			ix = i;
+			break;
+		}
+	}
+
+	if(ix < 0) reverse(all(nums));
+	else {
+		for(int j = N-1; j > ix; j--) {
+            if(nums[j] > nums[ix]) {
+                jx = j;
+                break;
+            }
         }
-        
-        if(arr[i] == 0 && i == currReach)
-            return -1;
-    }
-    return steps;
+		swap(nums[ix], nums[jx]);
+		reverse(nums.begin() + ix + 1, nums.end());
+	}
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("../input.txt", "r", stdin);
-  		freopen("../output.txt", "w", stdout);
+  		freopen("input.txt", "r", stdin);
+  		freopen("output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	// cin >> t;
+	cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

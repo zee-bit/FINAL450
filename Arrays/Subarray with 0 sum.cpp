@@ -46,28 +46,21 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int solve() {
+bool solve() {
 	int n;
 	cin >> n;
 	vi arr(n);
-	rep(i,0,n) cin >> arr[i];
+	rep(i, 0, n) cin >> arr[i];
 
-	int steps = 0;
-    int currMax = 0, currReach = 0;
-    
-    for(int i = 0; i < n - 1; i++) {
-        if(i + arr[i] > currMax)
-            currMax = arr[i] + i;
-        
-        if(i == currReach) {
-            steps++;
-            currReach = currMax;
-        }
-        
-        if(arr[i] == 0 && i == currReach)
-            return -1;
+	unordered_set<int> st;
+    st.insert(arr[0]);
+    for(int i = 1; i < n; i++) {
+        arr[i] = arr[i] + arr[i - 1];
+        if(arr[i] == 0 || st.count(arr[i]))
+            return true;
+        st.insert(arr[i]);
     }
-    return steps;
+    return false;
 }
 
 int main() {

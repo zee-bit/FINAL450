@@ -46,31 +46,33 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-void getAllPermutations(string &str, int idx, vector<string> &res) {
-	int N = str.size();
-	        
-	if(idx == N) {
-		res.push_back(str);
-		return;
-	}
-
-	for(int i = idx; i < N; i++) {
-		swap(str[i], str[idx]);
-		getAllPermutations(str, idx + 1, res);
-		swap(str[i], str[idx]);
-	}
-}
-
 void solve() {
-	string S;
-	cin >> S;
+	int N;
+	cin >> N;
+	vi nums(N);
+	rep(i, 0, N) cin >> nums[i];
 
-	int idx = 0;
-	vector<string> res;
-	getAllPermutations(S, idx, res);
-	sort(res.begin(), res.end());
-	
-	rep(i, 0, res.size()) cout << res[i] << " ";
+    int small_idx = -1, big_idx = -1;
+    for(int i = N-2; i >= 0; i--) {
+        if(nums[i] < nums[i + 1]) {
+            small_idx = i;
+            break;
+        }
+    }
+
+    if(small_idx < 0) reverse(nums.begin(), nums.end());
+    else {
+        for(int j = N-1; j > small_idx; j--) {
+            if(nums[j] > nums[small_idx]) {
+                big_idx = j;
+                break;
+            }
+        }
+        swap(nums[small_idx], nums[big_idx]);
+        reverse(nums.begin() + small_idx + 1, nums.end());
+    }
+
+    rep(i, 0, N) cout << nums[i] << " ";
 }
 
 int main() {

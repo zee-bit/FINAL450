@@ -46,31 +46,30 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-void getAllPermutations(string &str, int idx, vector<string> &res) {
-	int N = str.size();
-	        
-	if(idx == N) {
-		res.push_back(str);
-		return;
-	}
+bool solve() {
+	string str;
+	cin >> str;
 
-	for(int i = idx; i < N; i++) {
-		swap(str[i], str[idx]);
-		getAllPermutations(str, idx + 1, res);
-		swap(str[i], str[idx]);
-	}
-}
+	int N = str.length();
+    stack<char> st;
+    
+    for(char ch : str) {
+        if(ch == '(' || ch == '[' || ch == '{')
+            st.push(ch);
+        else {
+            if(st.empty()) return false;
+            
+            if(ch == ')' && st.top() != '(')
+                return false;
+            else if(ch == ']' && st.top() != '[')
+                return false;
+            else if(ch == '}' && st.top() != '{')
+                return false;
+            st.pop();
+        }
+    }
 
-void solve() {
-	string S;
-	cin >> S;
-
-	int idx = 0;
-	vector<string> res;
-	getAllPermutations(S, idx, res);
-	sort(res.begin(), res.end());
-	
-	rep(i, 0, res.size()) cout << res[i] << " ";
+    return st.empty();
 }
 
 int main() {
@@ -82,7 +81,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		solve();
+		cout << solve();
 	return 0;
 }
 

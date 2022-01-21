@@ -46,31 +46,25 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-void getAllPermutations(string &str, int idx, vector<string> &res) {
-	int N = str.size();
-	        
-	if(idx == N) {
-		res.push_back(str);
-		return;
-	}
-
-	for(int i = idx; i < N; i++) {
-		swap(str[i], str[idx]);
-		getAllPermutations(str, idx + 1, res);
-		swap(str[i], str[idx]);
-	}
-}
-
 void solve() {
-	string S;
-	cin >> S;
+	string str;
+	cin >> str;
 
-	int idx = 0;
-	vector<string> res;
-	getAllPermutations(S, idx, res);
-	sort(res.begin(), res.end());
-	
-	rep(i, 0, res.size()) cout << res[i] << " ";
+	int N = str.length();
+	string A = str, B = str;
+	vector<vector<int>> dp(N + 1, vector<int>(N + 1, 0));
+
+	for(int i = 1; i <= N; i++) {
+		for(int j = 1; j <= N; j++) {
+
+			if(A[i-1] == B[j-1] && i != j)
+				dp[i][j] = 1 + dp[i - 1][j - 1];
+			else
+				dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+		}
+	}
+
+	cout << dp[N][N];
 }
 
 int main() {

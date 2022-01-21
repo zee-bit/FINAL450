@@ -46,31 +46,34 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-void getAllPermutations(string &str, int idx, vector<string> &res) {
-	int N = str.size();
-	        
-	if(idx == N) {
-		res.push_back(str);
-		return;
-	}
-
-	for(int i = idx; i < N; i++) {
-		swap(str[i], str[idx]);
-		getAllPermutations(str, idx + 1, res);
-		swap(str[i], str[idx]);
-	}
-}
-
 void solve() {
-	string S;
-	cin >> S;
+	string s, t;
+	cin >> s >> t;
 
-	int idx = 0;
-	vector<string> res;
-	getAllPermutations(S, idx, res);
-	sort(res.begin(), res.end());
-	
-	rep(i, 0, res.size()) cout << res[i] << " ";
+	// first we compare last characters if same we will proceed 
+    // otherwise we can apply any one operation(1 operation is must) so return 1+min{insert,remove,replace}
+    // if we insert-→findfor(m,n-1) as that character at position stays now we compare n-1 and m;
+    // if we replace-→findfor(m-1,n-1)as we are replacing we move to next character from backward
+    // if we remove-→findfor(m-1,n) after removing we compare m-1 th with n th  of string 2
+    
+    int m = s.length(), n = t.length();
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+    
+    for(int i = 0; i <= m; i++) {
+        for(int j = 0; j <= n; j++) {
+            
+            if(i == 0) dp[i][j] = j;
+            else if(j == 0) dp[i][j] = i;
+            else {
+                if(s[i - 1] == t[j - 1])
+                    dp[i][j] = dp[i - 1][j - 1];
+                else
+                    dp[i][j] = 1 + min({dp[i - 1][j], dp[i][j - 1], dp[i - 1][ j - 1]});
+            }
+        }
+    }
+
+    cout << dp[m][n];
 }
 
 int main() {

@@ -1,1 +1,12 @@
+1040296 1019894
+abe
+abedabc
+bed
+abedabc
+eda
+abedabc
+dab
+abedabc
+abc
+abedabc
 -1

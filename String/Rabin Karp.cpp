@@ -46,31 +46,40 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-void getAllPermutations(string &str, int idx, vector<string> &res) {
-	int N = str.size();
-	        
-	if(idx == N) {
-		res.push_back(str);
-		return;
-	}
+# define PRIME 101
 
-	for(int i = idx; i < N; i++) {
-		swap(str[i], str[idx]);
-		getAllPermutations(str, idx + 1, res);
-		swap(str[i], str[idx]);
-	}
+ll recalculateHash(string &str, ll prevHash, int oldIdx, int &N) {
+	cout << str << "\n";
+	// cout << str[oldIdx] << " " << str[oldIdx + N + 1] << "\n";
+	ll newHash = prevHash - str[oldIdx];
+	newHash /= PRIME;
+	newHash += str[oldIdx + N + 1] * pow(PRIME, N);
+	return newHash;
 }
 
-void solve() {
-	string S;
-	cin >> S;
+int solve() {
+	string str, pat;
+	// cin >> str >> pat;
+	getline(cin, str);
+	getline(cin, pat);
 
-	int idx = 0;
-	vector<string> res;
-	getAllPermutations(S, idx, res);
-	sort(res.begin(), res.end());
-	
-	rep(i, 0, res.size()) cout << res[i] << " ";
+	int M = str.length(), N = pat.length();
+	ll patternHash = 0, textHash = 0;
+
+	for(int i = 0; i < N; i++) {
+		patternHash += pat[i] * pow(PRIME, i);
+		textHash += str[i] * pow(PRIME, i);
+	}
+	cout << textHash << " " << patternHash << "\n";
+
+	for(int i = 1; i <= M-N+1; i++) {
+		cout << str.substr(i - 1, N) << "\n";
+		if(patternHash == textHash && str.substr(i - 1, N) == pat)
+			return i - 1;
+		else
+			textHash = recalculateHash(str, textHash, i - 1, N);
+	}
+	return -1;
 }
 
 int main() {
@@ -82,7 +91,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		solve();
+		cout << solve();
 	return 0;
 }
 

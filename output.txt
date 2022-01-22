@@ -1,12 +1,3 @@
-1040296 1019894
-abe
-abedabc
-bed
-abedabc
-eda
-abedabc
-dab
-abedabc
-abc
-abedabc
--1
+0 5
+2 4
+4 6

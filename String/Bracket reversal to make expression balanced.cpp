@@ -46,36 +46,28 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-# define PRIME 101
-
-ll recalculateHash(string &str, ll prevHash, int oldIdx, int &N) {
-	int newIdx = oldIdx + N;
-	ll newHash = prevHash - str[oldIdx];
-	newHash /= PRIME;
-	newHash += str[newIdx] * pow(PRIME, N-1);
-	return newHash;
-}
-
 int solve() {
-	string str, pat;
-	getline(cin, str);
-	getline(cin, pat);
+	string s;
+	cin >> s;
 
-	int M = str.length(), N = pat.length();
-	ll patternHash = 0, textHash = 0;
-
-	for(int i = 0; i < N; i++) {
-		patternHash += pat[i] * pow(PRIME, i);
-		textHash += str[i] * pow(PRIME, i);
-	}
-
-	for(int i = 1; i <= M-N+1; i++) {
-		if(patternHash == textHash && str.substr(i - 1, N) == pat)
-			return i - 1;
-		if(i < M - N + 1)
-			textHash = recalculateHash(str, textHash, i - 1, N);
-	}
-	return -1;
+	int N = s.length();
+    if(N & 1) return -1;
+    
+    // INTUITION : Remove all the balanced part of expression, that will
+    // leave us with an expression someting like ..}}}..{{{..
+    // Now the total number of reversal to make this expresssion balanced
+    // will be ceil(open/2) + ceil(close/2).
+    int open = 0, close = 0;
+    for(char ch : s) {
+        if(ch == '{')
+            open++;
+        else {
+            if(open > 0) open--;
+            else close++;
+        }
+    }
+    
+    return (open + 1) / 2 + (close + 1) / 2;
 }
 
 int main() {

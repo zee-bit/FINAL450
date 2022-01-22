@@ -46,36 +46,24 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-# define PRIME 101
+void solve() {
+	string mapping[] = {
+		"2","22","222",
+		"3","33","333",
+		"4","44","444",
+		"5","55","555",
+		"6","66","666",
+		"7","77","777","7777",
+		"8","88","888",
+		"9","99","999","9999"
+	};
 
-ll recalculateHash(string &str, ll prevHash, int oldIdx, int &N) {
-	int newIdx = oldIdx + N;
-	ll newHash = prevHash - str[oldIdx];
-	newHash /= PRIME;
-	newHash += str[newIdx] * pow(PRIME, N-1);
-	return newHash;
-}
+	string str, res = "";
+	cin >> str;
 
-int solve() {
-	string str, pat;
-	getline(cin, str);
-	getline(cin, pat);
-
-	int M = str.length(), N = pat.length();
-	ll patternHash = 0, textHash = 0;
-
-	for(int i = 0; i < N; i++) {
-		patternHash += pat[i] * pow(PRIME, i);
-		textHash += str[i] * pow(PRIME, i);
-	}
-
-	for(int i = 1; i <= M-N+1; i++) {
-		if(patternHash == textHash && str.substr(i - 1, N) == pat)
-			return i - 1;
-		if(i < M - N + 1)
-			textHash = recalculateHash(str, textHash, i - 1, N);
-	}
-	return -1;
+	for(char ch : str)
+		res += mapping[ch-'A'];
+	cout << res;
 }
 
 int main() {
@@ -87,7 +75,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

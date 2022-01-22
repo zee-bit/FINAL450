@@ -46,36 +46,44 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-# define PRIME 101
-
-ll recalculateHash(string &str, ll prevHash, int oldIdx, int &N) {
-	int newIdx = oldIdx + N;
-	ll newHash = prevHash - str[oldIdx];
-	newHash /= PRIME;
-	newHash += str[newIdx] * pow(PRIME, N-1);
-	return newHash;
+bool dfs(vector<vector<char>> &grid, int i, int j, int &M, int &N, int idx, string &word) {
+    for(int d = 0; d < 4; d++) {
+        int x = i, y = j, idx = 0;
+    	while(x >= 0 && x < M && y >= 0 && y < N && idx < word.length() && grid[x][y] == word[idx]) {
+            x = x + dx4[d];
+            y = y + dy4[d];
+            idx++;
+    	}
+    	if(idx == word.length()) return true;
+    }
+    
+    return false;
 }
 
-int solve() {
-	string str, pat;
-	getline(cin, str);
-	getline(cin, pat);
-
-	int M = str.length(), N = pat.length();
-	ll patternHash = 0, textHash = 0;
-
-	for(int i = 0; i < N; i++) {
-		patternHash += pat[i] * pow(PRIME, i);
-		textHash += str[i] * pow(PRIME, i);
+void solve() {
+	int M, N;
+	cin >> M >> N;
+	vector<vector<char>> matrix(M, vector<char>(N));
+	rep(i, 0, M) {
+		rep(j, 0, N) {
+			cin >> matrix[i][j];
+		}
 	}
 
-	for(int i = 1; i <= M-N+1; i++) {
-		if(patternHash == textHash && str.substr(i - 1, N) == pat)
-			return i - 1;
-		if(i < M - N + 1)
-			textHash = recalculateHash(str, textHash, i - 1, N);
+	string str;
+	cin >> str;
+
+	int res = 0;
+
+	rep(i, 0, M) {
+		rep(j, 0, N) {
+			if(matrix[i][j] == str[0]) {
+				if(dfs(matrix, i, j, M, N, 0, str))
+					res++;
+			}
+		}
 	}
-	return -1;
+	cout << res;
 }
 
 int main() {
@@ -87,7 +95,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

@@ -17,7 +17,7 @@ struct custom_hash;
 #define ub upper_bound
 #define lb lower_bound
 #define popf pop_front
-#define mod 1000000007
+#define MOD 1000000007
 #define vi vector<int> 
 #define mll map<ll, ll>
 #define vll vector <ll>
@@ -46,36 +46,26 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-# define PRIME 101
-
-ll recalculateHash(string &str, ll prevHash, int oldIdx, int &N) {
-	int newIdx = oldIdx + N;
-	ll newHash = prevHash - str[oldIdx];
-	newHash /= PRIME;
-	newHash += str[newIdx] * pow(PRIME, N-1);
-	return newHash;
+ll count(string &str, int i, int j, vector<vector<ll>> &dp) {
+    if(i == j) return 1;
+    if(i > j) return 0;
+    if(dp[i][j] != -1) return dp[i][j];
+    
+    if(str[i] == str[j]) {
+        return dp[i][j] = (1 + count(str, i + 1, j, dp) + count(str, i, j - 1, dp)) % MOD;
+    }
+    else {
+        return dp[i][j] = (MOD + count(str, i + 1, j, dp) + count(str, i, j - 1, dp) - count(str, i + 1, j - 1, dp)) % MOD;
+    }
 }
 
-int solve() {
-	string str, pat;
-	getline(cin, str);
-	getline(cin, pat);
+void solve() {
+	string str;
+	cin >> str;
 
-	int M = str.length(), N = pat.length();
-	ll patternHash = 0, textHash = 0;
-
-	for(int i = 0; i < N; i++) {
-		patternHash += pat[i] * pow(PRIME, i);
-		textHash += str[i] * pow(PRIME, i);
-	}
-
-	for(int i = 1; i <= M-N+1; i++) {
-		if(patternHash == textHash && str.substr(i - 1, N) == pat)
-			return i - 1;
-		if(i < M - N + 1)
-			textHash = recalculateHash(str, textHash, i - 1, N);
-	}
-	return -1;
+	int N = str.size();
+    vector<vector<ll>> dp(N, vector<ll>(N, -1));
+    cout << count(str, 0, N-1, dp);
 }
 
 int main() {
@@ -87,7 +77,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

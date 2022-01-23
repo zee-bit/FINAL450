@@ -1,9 +1,1 @@
-7 9
-b b d d e d b d d
-b c b c e c a d c
-a e b e d b e e d
-d c d e c b b b e
-b c a e c c d a a
-a a c b a c a c a
-a c b d b d b e c
-dcb
+GEEKSGEEKSFOR

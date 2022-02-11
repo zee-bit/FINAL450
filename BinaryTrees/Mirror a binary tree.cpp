@@ -89,11 +89,11 @@ void invertTree3(Node *node) {
 	while(!st.empty()) {
 		Node *child = st.top(); st.pop();
 		Node *tempRight = child -> right;
-		node -> right = node -> left;
-		node -> left = tempRight;
+		child -> right = child -> left;
+		child -> left = tempRight;
 
-		if(node -> left) st.push(node -> left);
-		if(node -> right) st.push(node -> right);
+		if(child -> left) st.push(child -> left);
+		if(child -> right) st.push(child -> right);
 	}
 }
 

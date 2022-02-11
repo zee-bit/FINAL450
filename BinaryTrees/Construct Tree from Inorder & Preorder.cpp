@@ -59,14 +59,14 @@ struct Node
 };
 
 Node *buildTree() {
-	//			1
-	//		   / \
-	//		  2   3
-	//		 /   / \
-	//		4   5  6
-	//		   / \
-	//		  7  8
-	Node* root = new Node(1);
+    //          1
+    //         / \
+    //        2   3
+    //       /   / \
+    //      4   5  6
+    //         / \
+    //        7  8
+    Node* root = new Node(1);
     root->left = new Node(2);
     root->right = new Node(3);
     root->left->left = new Node(4);
@@ -77,62 +77,51 @@ Node *buildTree() {
     return root;
 }
 
-// METHOD-1
-int max_level = 0;
-vector<int> res;
-
-void rightView(Node *node, int level) {
-	if(node == NULL)
-		return;
-
-	if(level > max_level) {
-		max_level = level;
-		res.push_back(node -> val);
-	}
-	rightView(node -> right, level + 1);
-	rightView(node -> left, level + 1);
-}
-
-// METHOD-2
-void rightView2(Node *node) {
-	if(node == NULL)
-		return;
-
-	queue<Node *> q;
-	q.push(node);
-
-	while(!q.empty()) {
-		int sz = q.size();
-		for(int i = 0; i < sz; i++) {
-			Node *curr = q.front(); q.pop();
-			if(i == 0) res.push_back(curr -> val);
-
-			if(curr -> right) q.push(curr -> right);
-			if(curr -> left) q.push(curr -> left);
-		}
-	}
+Node* buildTree(int in[],int pre[], int n)
+{
+    if(n == 0)
+        return NULL;
+    
+    Node *root = new Node(pre[0]);
+    
+    int part = 0;
+    for(int i = 0; i < n; i++) {
+        if(in[i] == pre[0]) {
+            part = i;
+            break;
+        }
+    }
+    
+    root -> left = buildTree(in, pre + 1, part);
+    root -> right = buildTree(in + part + 1, pre + part + 1, n - part - 1);
+    return root;
 }
 
 void solve() {
 
-	// Implement build tree method
-	Node* root = buildTree();
+    // Implement build tree method
+    int n;
+    cin >> n;
+    vi inorder(n), preorder(n);
+    rep(i, 0, n) cin >> inorder[i];
+    rep(i, 0, n) cin >> postorder[i];
 
-	rightView(root, 1);
-	for(auto node : res) cout << node << " ";
+    Node *root = buildTree(inorder, postorder, n);
+
+    printTree(root);
 }
 
 int main() {
-	fast;
-	#ifndef ONLINE_JUDGE
-  		freopen("../input.txt", "r", stdin);
-  		freopen("../output.txt", "w", stdout);
-	#endif
-	int t = 1;
-	// cin >> t;
-	while(t--)
-		solve();
-	return 0;
+    fast;
+    #ifndef ONLINE_JUDGE
+        freopen("../input.txt", "r", stdin);
+        freopen("../output.txt", "w", stdout);
+    #endif
+    int t = 1;
+    // cin >> t;
+    while(t--)
+        solve();
+    return 0;
 }
 
 #pragma GCC diagnostic pop

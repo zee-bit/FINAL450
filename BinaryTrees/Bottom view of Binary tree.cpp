@@ -77,40 +77,18 @@ Node *buildTree() {
     return root;
 }
 
-// METHOD-1
-int max_level = 0;
-vector<int> res;
-
-void rightView(Node *node, int level) {
-	if(node == NULL)
-		return;
-
-	if(level > max_level) {
-		max_level = level;
-		res.push_back(node -> val);
-	}
-	rightView(node -> right, level + 1);
-	rightView(node -> left, level + 1);
-}
-
-// METHOD-2
-void rightView2(Node *node) {
-	if(node == NULL)
-		return;
-
-	queue<Node *> q;
-	q.push(node);
-
-	while(!q.empty()) {
-		int sz = q.size();
-		for(int i = 0; i < sz; i++) {
-			Node *curr = q.front(); q.pop();
-			if(i == 0) res.push_back(curr -> val);
-
-			if(curr -> right) q.push(curr -> right);
-			if(curr -> left) q.push(curr -> left);
-		}
-	}
+void getTopNodes(Node *node, int dis, int level, map<int, pair<int, int>> &mp) {
+    if(!node) return;
+    
+    if(!mp.count(dis)) {
+        mp[dis] = {node -> val, level};
+    }
+    else if(mp[dis].second <= level) {
+        mp[dis] = {node -> val, level};
+    }
+    
+    getTopNodes(node -> left, dis - 1, level + 1, mp);
+    getTopNodes(node -> right, dis + 1, level + 1, mp);
 }
 
 void solve() {
@@ -118,8 +96,15 @@ void solve() {
 	// Implement build tree method
 	Node* root = buildTree();
 
-	rightView(root, 1);
-	for(auto node : res) cout << node << " ";
+	map<int, pair<int, int>> mp;
+	getTopNodes(root, 0, 0, mp);
+
+	vector<int> res;
+	for(auto pr : mp) {
+		res.push_back(pr.second.first);
+	}
+
+	for(auto ele : res) cout << ele << " ";
 }
 
 int main() {

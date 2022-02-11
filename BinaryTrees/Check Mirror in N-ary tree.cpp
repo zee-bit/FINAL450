@@ -46,80 +46,31 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-struct Node
-{
-    int val;
-    struct Node* left;
-    struct Node* right;
+bool checkMirrorTree(int n, int e, int A[], int B[]) {
+    unordered_map<int, stack<int>> mp;
     
-    Node(int x){
-        val = x;
-        left = right = NULL;
+    for(int i = 0; i < 2 * e; i += 2) {
+        mp[A[i]].push(A[i + 1]);
     }
-};
-
-Node *buildTree() {
-	//			1
-	//		   / \
-	//		  2   3
-	//		 /   / \
-	//		4   5  6
-	//		   / \
-	//		  7  8
-	Node* root = new Node(1);
-    root->left = new Node(2);
-    root->right = new Node(3);
-    root->left->left = new Node(4);
-    root->right->left = new Node(5);
-    root->right->right = new Node(6);
-    root->right->left->left = new Node(7);
-    root->right->left->right = new Node(8);
-    return root;
-}
-
-// METHOD-1
-int max_level = 0;
-vector<int> res;
-
-void rightView(Node *node, int level) {
-	if(node == NULL)
-		return;
-
-	if(level > max_level) {
-		max_level = level;
-		res.push_back(node -> val);
-	}
-	rightView(node -> right, level + 1);
-	rightView(node -> left, level + 1);
-}
-
-// METHOD-2
-void rightView2(Node *node) {
-	if(node == NULL)
-		return;
-
-	queue<Node *> q;
-	q.push(node);
-
-	while(!q.empty()) {
-		int sz = q.size();
-		for(int i = 0; i < sz; i++) {
-			Node *curr = q.front(); q.pop();
-			if(i == 0) res.push_back(curr -> val);
-
-			if(curr -> right) q.push(curr -> right);
-			if(curr -> left) q.push(curr -> left);
-		}
-	}
+    
+    for(int i = 0; i < 2 * e; i += 2) {
+        if(mp[B[i]].top() != B[i + 1])
+            return false;
+        mp[B[i]].pop();
+    }
+    
+    return true;
 }
 
 void solve() {
+	int n, e;
+	cin >> n >> e;
+	vi A(2*e), B(2*e);
 
-	// Implement build tree method
-	Node* root = buildTree();
+	rep(i, 0, 2*e) cin >> A[i];
+	rep(i, 0, 2*e) cin >> B[i];
 
-	rightView(root, 1);
-	for(auto node : res) cout << node << " ";
+	cout << checkMirrorTree(n, e, A, B);
 }
 
 int main() {

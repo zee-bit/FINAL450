@@ -77,49 +77,50 @@ Node *buildTree() {
     return root;
 }
 
-// METHOD-1
-int max_level = 0;
-vector<int> res;
+Node* createTree(string &str, int &idx) {
+	if(str.length() == 0 || idx == str.length())
+		return NULL;
 
-void rightView(Node *node, int level) {
-	if(node == NULL)
-		return;
-
-	if(level > max_level) {
-		max_level = level;
-		res.push_back(node -> val);
+	int num = 0;
+	while(idx < str.length() && str[idx] != '(' && str[idx] != ')') {
+		int curr = str[idx] - '0';
+		num = num * 10 + curr;
+		idx++;
 	}
-	rightView(node -> right, level + 1);
-	rightView(node -> left, level + 1);
-}
 
-// METHOD-2
-void rightView2(Node *node) {
-	if(node == NULL)
-		return;
+	Node *node = new Node(num);
 
-	queue<Node *> q;
-	q.push(node);
-
-	while(!q.empty()) {
-		int sz = q.size();
-		for(int i = 0; i < sz; i++) {
-			Node *curr = q.front(); q.pop();
-			if(i == 0) res.push_back(curr -> val);
-
-			if(curr -> right) q.push(curr -> right);
-			if(curr -> left) q.push(curr -> left);
-		}
+	if(idx < str.length() && str[idx] == '(') {
+		idx++;
+		node -> left = createTree(str, idx);
 	}
+	if(idx < str.length() && str[idx] == ')') {
+		idx++;
+		return node;
+	}
+
+	if(idx < str.length() && str[idx] == '(') {
+		idx++;
+		node -> right = createTree(str, idx);
+	}
+	if(idx < str.length() && str[idx] == ')') {
+		idx++;
+		return node;
+	}
+	return node;
 }
 
 void solve() {
-
+	string str;
+	cin >> str;
 	// Implement build tree method
-	Node* root = buildTree();
+	// Node* root = buildTree();
 
-	rightView(root, 1);
-	for(auto node : res) cout << node << " ";
+	int idx = 0;
+	Node *root = createTree(str, idx);
+	
+	// print tree
+	printTree(root);
 }
 
 int main() {

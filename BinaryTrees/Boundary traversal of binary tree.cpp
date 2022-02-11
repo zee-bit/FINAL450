@@ -59,14 +59,14 @@ struct Node
 };
 
 Node *buildTree() {
-	//			1
-	//		   / \
-	//		  2   3
-	//		 /   / \
-	//		4   5  6
-	//		   / \
-	//		  7  8
-	Node* root = new Node(1);
+    //          1
+    //         / \
+    //        2   3
+    //       /   / \
+    //      4   5  6
+    //         / \
+    //        7  8
+    Node* root = new Node(1);
     root->left = new Node(2);
     root->right = new Node(3);
     root->left->left = new Node(4);
@@ -77,62 +77,69 @@ Node *buildTree() {
     return root;
 }
 
-// METHOD-1
-int max_level = 0;
-vector<int> res;
-
-void rightView(Node *node, int level) {
-	if(node == NULL)
-		return;
-
-	if(level > max_level) {
-		max_level = level;
-		res.push_back(node -> val);
-	}
-	rightView(node -> right, level + 1);
-	rightView(node -> left, level + 1);
+void addLeft(Node *node, vector<int> &res) {
+    Node *curr = node;
+    while(curr) {
+        if(curr -> left != curr -> right)
+            res.push_back(curr -> data);
+        
+        if(curr -> left)
+            curr = curr -> left;
+        else
+            curr = curr -> right;
+    }
 }
 
-// METHOD-2
-void rightView2(Node *node) {
-	if(node == NULL)
-		return;
+void addRight(Node *node, vector<int> &res) {
+    Node *curr = node;
+    int start = res.size();
+    while(curr) {
+        if(curr -> left != curr -> right)
+            res.push_back(curr -> data);
+        
+        if(curr -> right)
+            curr = curr -> right;
+        else
+            curr = curr -> left;
+    }
+    reverse(res.begin() + start, res.end());
+}
 
-	queue<Node *> q;
-	q.push(node);
-
-	while(!q.empty()) {
-		int sz = q.size();
-		for(int i = 0; i < sz; i++) {
-			Node *curr = q.front(); q.pop();
-			if(i == 0) res.push_back(curr -> val);
-
-			if(curr -> right) q.push(curr -> right);
-			if(curr -> left) q.push(curr -> left);
-		}
-	}
+void addBottom(Node *node, vector<int> &res) {
+    if(node -> left == node -> right) {
+        res.push_back(node -> data);
+        return;
+    }
+    if(node -> left) addBottom(node -> left, res);
+    if(node -> right) addBottom(node -> right, res);
 }
 
 void solve() {
 
-	// Implement build tree method
-	Node* root = buildTree();
+    // Implement build tree method
+    Node* root = buildTree();
 
-	rightView(root, 1);
-	for(auto node : res) cout << node << " ";
+    vector<int> res;
+    if(root -> left != root -> right) res.push_back(root -> data);
+    
+    addLeft(root -> left, res);
+    addBottom(root, res);
+    addRight(root -> right, res);
+
+    for(auto ele : res) cout << ele << " ";
 }
 
 int main() {
-	fast;
-	#ifndef ONLINE_JUDGE
-  		freopen("../input.txt", "r", stdin);
-  		freopen("../output.txt", "w", stdout);
-	#endif
-	int t = 1;
-	// cin >> t;
-	while(t--)
-		solve();
-	return 0;
+    fast;
+    #ifndef ONLINE_JUDGE
+        freopen("../input.txt", "r", stdin);
+        freopen("../output.txt", "w", stdout);
+    #endif
+    int t = 1;
+    // cin >> t;
+    while(t--)
+        solve();
+    return 0;
 }
 
 #pragma GCC diagnostic pop

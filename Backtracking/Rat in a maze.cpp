@@ -21,8 +21,8 @@ struct custom_hash;
 #define vi vector<int> 
 #define mll map<ll, ll>
 #define vll vector <ll>
-const int dx4[]={-1,0,1,0};
-const int dy4[]={0,1,0,-1};
+const int dx[]={-1,0,1,0};
+const int dy[]={0,1,0,-1};
 #define vvi vector<vector<int> >
 #define all(v) v.begin(), v.end()
 #define rall(v) v.rbegin(), v.rend()
@@ -46,55 +46,57 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMedian(vi &a, vi &b, int s1, int e1, int s2, int e2) {
-	if(s1 == e1 && s2 == e2)
-		return (a[s1] + b[s2]) / 2;
-	if(e1 - s1 == 1 && e2 - s2 == 1)
-		return (max(a[s1],b[s2]) + min(a[e1],b[e2])) / 2;
+void getPaths(vector<vector<int>> &mat, int i, int j, int N, string path, vector<string> &res) {
+    if(i == N-1 && j == N-1) {
+        res.push_back(path);
+        return;
+    }
+    if(mat[i][j] == 0)
+        return;
+    
+    mat[i][j] = 0;
+    for(int d = 0; d < 4; d++) {
+        int x = i + dx[d], y = j + dy[d];
+        if(x < 0 || x >= N || y < 0 || y >= N || mat[x][y] == 0)
+            continue;
+        
+        if(d == 0) getPaths(mat, x, y, N, path+"L", res);
+        if(d == 1) getPaths(mat, x, y, N, path+"D", res);
+        if(d == 2) getPaths(mat, x, y, N, path+"R", res);
+        if(d == 3) getPaths(mat, x, y, N, path+"U", res);
+    }
+    mat[i][j] = 1;
+}
 
-	int med_a_idx = (s1 + e1) / 2;
-	int med_b_idx = (s2 + e2) / 2;
-
-	int med_a = a[med_a_idx];
-	int med_b = b[med_b_idx];
-
-	if(med_a == med_b)
-		return med_a;
-	else if(med_a < med_b) {
-		s1 = med_a_idx;
-		e2 = med_b_idx;
-	}
-	else {
-		s2 = med_b_idx;
-		e1 = med_a_idx;
-	}
-	return getMedian(a, b, s1, e1, s2, e2);
+void getPaths2(vector<vector<int>> &m, int n, string path, int x, int y, vector<string> &ans) {
+    if(x < 0 || x >= n || y < 0 || y >= n || m[x][y] == 0) return;
+    if(x == n-1 && y == n-1){
+        ans.push_back(path);
+        return;
+    }
+    m[x][y] = 0;
+    getPaths2(m,n,path+"D",x+1,y,ans);
+    getPaths2(m,n,path+"L",x,y-1,ans);
+    getPaths2(m,n,path+"R",x,y+1,ans);
+    getPaths2(m,n,path+"U",x-1,y,ans);
+    m[x][y] = 1;
 }
 
 void solve() {
-	int N, M;
-	cin >> N >> M;
-	vi a(N), b(M);
-	rep(i, 0, N) cin >> a[i];
-	rep(i, 0, M) cin >> b[i];
-
-	// METHOD-1: Partition array [O(N)]
-	int i = N-1, j = 0;
-	while(a[i] > b[j]) {
-		swap(a[i], b[j]);
-		i--;
-		j++;
+	int n;
+	cin >> n;
+	vvi mat(n, vi(n));
+	rep(i,0,n) {
+		rep(j,0,n) {
+			cin >> mat[i][j];
+		}
 	}
-	int x = a[0], y = b[0];
-	for(int i = 1; i < N; i++) {
-		x = max(x, a[i]);
-		y = min(y, b[i]);
-	}
-	cout << (x + y) / 2.0;
 
-	// METHOD-2: Median method [O(logN)]
-	int median = getMedian(a, b, 0, N, 0, M);
-	cout << median;
+	string path = "";
+    vector<string> res;
+    
+    getPaths(mat, 0, 0, n, path, res);
+    rep(i,0,res.size()) cout << res[i] << " ";
 }
 
 int main() {

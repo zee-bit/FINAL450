@@ -46,55 +46,48 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMedian(vi &a, vi &b, int s1, int e1, int s2, int e2) {
-	if(s1 == e1 && s2 == e2)
-		return (a[s1] + b[s2]) / 2;
-	if(e1 - s1 == 1 && e2 - s2 == 1)
-		return (max(a[s1],b[s2]) + min(a[e1],b[e2])) / 2;
-
-	int med_a_idx = (s1 + e1) / 2;
-	int med_b_idx = (s2 + e2) / 2;
-
-	int med_a = a[med_a_idx];
-	int med_b = b[med_b_idx];
-
-	if(med_a == med_b)
-		return med_a;
-	else if(med_a < med_b) {
-		s1 = med_a_idx;
-		e2 = med_b_idx;
-	}
-	else {
-		s2 = med_b_idx;
-		e1 = med_a_idx;
-	}
-	return getMedian(a, b, s1, e1, s2, e2);
+bool canPartition(int idx, int cnt, int &target, int &k, int a[], vector<int> &set) {
+    if(cnt == k) // k-1 works as well and is better
+        return true;
+    
+    for(int j = 0; j < k; j++) {
+        set[j] += a[idx];
+        
+        if(set[j] == target)
+            cnt++;
+        
+        if(set[j] <= target) {
+            if(canPartition(idx+1, cnt, target, k, a, set))
+                return true;
+        }
+        
+        if(set[j] == target)
+            cnt--;
+        
+        set[j] -= a[idx];
+    }
+    
+    return false;
 }
 
 void solve() {
-	int N, M;
-	cin >> N >> M;
-	vi a(N), b(M);
-	rep(i, 0, N) cin >> a[i];
-	rep(i, 0, M) cin >> b[i];
+	int n, k;
+	cin >> n >> k;
+	vi a(n);
+	rep(i, 0, n) cin >> a[i];
 
-	// METHOD-1: Partition array [O(N)]
-	int i = N-1, j = 0;
-	while(a[i] > b[j]) {
-		swap(a[i], b[j]);
-		i--;
-		j++;
-	}
-	int x = a[0], y = b[0];
-	for(int i = 1; i < N; i++) {
-		x = max(x, a[i]);
-		y = min(y, b[i]);
-	}
-	cout << (x + y) / 2.0;
-
-	// METHOD-2: Median method [O(logN)]
-	int median = getMedian(a, b, 0, N, 0, M);
-	cout << median;
+	int sum = accumulate(a, a+n, 0);
+    if(sum % k != 0) return false;
+    if(n < k) return false;
+    
+    int target = sum / k;
+    vector<int> set(k, 0);
+    
+    // return false if any element is greater than target
+    for(int i = 0; i < n; i++) {
+        if(a[i] > target) return false;
+    }
+    cout << canPartition(0, 0, target, k, a, set);
 }
 
 int main() {

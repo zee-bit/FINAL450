@@ -46,55 +46,47 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMedian(vi &a, vi &b, int s1, int e1, int s2, int e2) {
-	if(s1 == e1 && s2 == e2)
-		return (a[s1] + b[s2]) / 2;
-	if(e1 - s1 == 1 && e2 - s2 == 1)
-		return (max(a[s1],b[s2]) + min(a[e1],b[e2])) / 2;
-
-	int med_a_idx = (s1 + e1) / 2;
-	int med_b_idx = (s2 + e2) / 2;
-
-	int med_a = a[med_a_idx];
-	int med_b = b[med_b_idx];
-
-	if(med_a == med_b)
-		return med_a;
-	else if(med_a < med_b) {
-		s1 = med_a_idx;
-		e2 = med_b_idx;
-	}
-	else {
-		s2 = med_b_idx;
-		e1 = med_a_idx;
-	}
-	return getMedian(a, b, s1, e1, s2, e2);
+void solve(string &s, int idx, string curr, int left, int right, int open, unordered_set<string> &res) {
+    if(left < 0 || right < 0 || open < 0)
+        return;
+    
+    if(idx == s.length()) {
+        if(left == 0 && right == 0 && open == 0)
+            res.insert(curr);
+        return;
+    }
+    
+    if(s[idx] == '(') {
+        solve(s, idx + 1, curr, left-1, right, open, res);
+        solve(s, idx + 1, curr + "(", left, right, open+1, res);
+    }
+    else if(s[idx] == ')') {
+        solve(s, idx + 1, curr, left, right-1, open, res);
+        solve(s, idx + 1, curr + ")", left, right, open-1, res);
+    }
+    else
+        solve(s, idx + 1, curr + s[idx], left, right, open, res);
 }
 
 void solve() {
-	int N, M;
-	cin >> N >> M;
-	vi a(N), b(M);
-	rep(i, 0, N) cin >> a[i];
-	rep(i, 0, M) cin >> b[i];
+	string s;
+	cin >> s;
 
-	// METHOD-1: Partition array [O(N)]
-	int i = N-1, j = 0;
-	while(a[i] > b[j]) {
-		swap(a[i], b[j]);
-		i--;
-		j++;
-	}
-	int x = a[0], y = b[0];
-	for(int i = 1; i < N; i++) {
-		x = max(x, a[i]);
-		y = min(y, b[i]);
-	}
-	cout << (x + y) / 2.0;
-
-	// METHOD-2: Median method [O(logN)]
-	int median = getMedian(a, b, 0, N, 0, M);
-	cout << median;
+	int left = 0, right = 0, open = 0;
+    for(char &ch : s) {
+        if(ch == '(')
+            left++;
+        else if(ch == ')') {
+            if(left > 0)
+                left--;
+            else
+                right++;
+        }
+    }
+    unordered_set<string> res;
+    solve(s, 0, "", left, right, open, res);
+    for(auto ele : res)
+        cout << ele << " ";
 }
 
 int main() {

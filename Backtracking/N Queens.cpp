@@ -46,55 +46,41 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMedian(vi &a, vi &b, int s1, int e1, int s2, int e2) {
-	if(s1 == e1 && s2 == e2)
-		return (a[s1] + b[s2]) / 2;
-	if(e1 - s1 == 1 && e2 - s2 == 1)
-		return (max(a[s1],b[s2]) + min(a[e1],b[e2])) / 2;
-
-	int med_a_idx = (s1 + e1) / 2;
-	int med_b_idx = (s2 + e2) / 2;
-
-	int med_a = a[med_a_idx];
-	int med_b = b[med_b_idx];
-
-	if(med_a == med_b)
-		return med_a;
-	else if(med_a < med_b) {
-		s1 = med_a_idx;
-		e2 = med_b_idx;
-	}
-	else {
-		s2 = med_b_idx;
-		e1 = med_a_idx;
-	}
-	return getMedian(a, b, s1, e1, s2, e2);
+void getWays(
+	int row, int n, vector<bool> &col, vector<bool> &pd,
+	vector<bool> &sd, vector<int> &curr, vector<vector<int>> &res
+) {
+    if(row == n) {
+        res.push_back(curr);
+        return;
+    }
+    
+    for(int c = 0; c < n; c++) {
+        if(col[c] || pd[row-c+n-1] || sd[row+c]) continue;
+        
+        curr.push_back(c+1);
+        col[c] = pd[row-c+n-1] = sd[row+c] = true;
+        getWays(row+1, n, col, pd, sd, curr, res);
+        col[c] = pd[row-c+n-1] = sd[row+c] = false;
+        curr.pop_back();
+    }
 }
 
 void solve() {
-	int N, M;
-	cin >> N >> M;
-	vi a(N), b(M);
-	rep(i, 0, N) cin >> a[i];
-	rep(i, 0, M) cin >> b[i];
+	int n;
+	cin >> n;
+	vector<int> curr;
+    vector<vector<int>> res;
+    vector<bool> col(n), pd(2*n-1), sd(2*n-1);
+    
+    getWays(0, n, col, pd, sd, curr, res);
 
-	// METHOD-1: Partition array [O(N)]
-	int i = N-1, j = 0;
-	while(a[i] > b[j]) {
-		swap(a[i], b[j]);
-		i--;
-		j++;
-	}
-	int x = a[0], y = b[0];
-	for(int i = 1; i < N; i++) {
-		x = max(x, a[i]);
-		y = min(y, b[i]);
-	}
-	cout << (x + y) / 2.0;
-
-	// METHOD-2: Median method [O(logN)]
-	int median = getMedian(a, b, 0, N, 0, M);
-	cout << median;
+    rep(i, 0, res.size()) {
+    	rep(j, 0, res[i].size()) {
+    		cout << res[i][j] << " ";
+    	}
+    	cout << "\n";
+    }
 }
 
 int main() {

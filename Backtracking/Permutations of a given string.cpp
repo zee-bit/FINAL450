@@ -46,55 +46,28 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMedian(vi &a, vi &b, int s1, int e1, int s2, int e2) {
-	if(s1 == e1 && s2 == e2)
-		return (a[s1] + b[s2]) / 2;
-	if(e1 - s1 == 1 && e2 - s2 == 1)
-		return (max(a[s1],b[s2]) + min(a[e1],b[e2])) / 2;
-
-	int med_a_idx = (s1 + e1) / 2;
-	int med_b_idx = (s2 + e2) / 2;
-
-	int med_a = a[med_a_idx];
-	int med_b = b[med_b_idx];
-
-	if(med_a == med_b)
-		return med_a;
-	else if(med_a < med_b) {
-		s1 = med_a_idx;
-		e2 = med_b_idx;
-	}
-	else {
-		s2 = med_b_idx;
-		e1 = med_a_idx;
-	}
-	return getMedian(a, b, s1, e1, s2, e2);
+void getAllPermutations(string &str, int idx, vector<string> &res) {
+    int N = str.size();
+    
+    if(idx == N) {
+        res.push_back(str);
+        return;
+    }
+    
+    for(int i = idx; i < N; i++) {
+        swap(str[i], str[idx]);
+        getAllPermutations(str, idx + 1, res);
+        swap(str[i], str[idx]);
+    }
 }
 
 void solve() {
-	int N, M;
-	cin >> N >> M;
-	vi a(N), b(M);
-	rep(i, 0, N) cin >> a[i];
-	rep(i, 0, M) cin >> b[i];
+	int str;
+	cin >> str;
 
-	// METHOD-1: Partition array [O(N)]
-	int i = N-1, j = 0;
-	while(a[i] > b[j]) {
-		swap(a[i], b[j]);
-		i--;
-		j++;
-	}
-	int x = a[0], y = b[0];
-	for(int i = 1; i < N; i++) {
-		x = max(x, a[i]);
-		y = min(y, b[i]);
-	}
-	cout << (x + y) / 2.0;
-
-	// METHOD-2: Median method [O(logN)]
-	int median = getMedian(a, b, 0, N, 0, M);
-	cout << median;
+	vector<string> res;
+	getAllPermutations(str, 0, res);
+	rep(i, 0, res.size()) cout << res[i] << " ";
 }
 
 int main() {

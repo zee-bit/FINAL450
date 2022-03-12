@@ -46,55 +46,44 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMedian(vi &a, vi &b, int s1, int e1, int s2, int e2) {
-	if(s1 == e1 && s2 == e2)
-		return (a[s1] + b[s2]) / 2;
-	if(e1 - s1 == 1 && e2 - s2 == 1)
-		return (max(a[s1],b[s2]) + min(a[e1],b[e2])) / 2;
-
-	int med_a_idx = (s1 + e1) / 2;
-	int med_b_idx = (s2 + e2) / 2;
-
-	int med_a = a[med_a_idx];
-	int med_b = b[med_b_idx];
-
-	if(med_a == med_b)
-		return med_a;
-	else if(med_a < med_b) {
-		s1 = med_a_idx;
-		e2 = med_b_idx;
+void getPaths(vvi &arr, int i, int j, int M, int N, vi &curr, vvi &res) {
+	if(i == M-1 && j == N-1) {
+		curr.push_back(arr[M-1][N-1]);
+		res.push_back(curr);
+		curr.pop_back();
+		return;
 	}
-	else {
-		s2 = med_b_idx;
-		e1 = med_a_idx;
-	}
-	return getMedian(a, b, s1, e1, s2, e2);
+
+	if(i < 0 || j < 0 || i >= M || j >= N)
+		return;
+
+	curr.push_back(arr[i][j]);
+	getPaths(arr, i+1, j, M, N, curr, res);
+	getPaths(arr, i, j+1, M, N, curr, res);
+	curr.pop_back();
 }
 
 void solve() {
-	int N, M;
-	cin >> N >> M;
-	vi a(N), b(M);
-	rep(i, 0, N) cin >> a[i];
-	rep(i, 0, M) cin >> b[i];
-
-	// METHOD-1: Partition array [O(N)]
-	int i = N-1, j = 0;
-	while(a[i] > b[j]) {
-		swap(a[i], b[j]);
-		i--;
-		j++;
+	int m, n;
+	cin >> m >> n;
+	vvi arr(m, vi(n));
+	rep(i, 0, m) {
+		rep(j, 0, n) {
+			arr[i][j] = i*n + j+ 1;
+			cout << arr[i][j] << " ";
+		}
+		cout << "\n";
 	}
-	int x = a[0], y = b[0];
-	for(int i = 1; i < N; i++) {
-		x = max(x, a[i]);
-		y = min(y, b[i]);
-	}
-	cout << (x + y) / 2.0;
 
-	// METHOD-2: Median method [O(logN)]
-	int median = getMedian(a, b, 0, N, 0, M);
-	cout << median;
+	vi curr;
+	vvi res;
+	getPaths(arr, 0, 0, m, n, curr, res);
+	rep(i, 0, res.size()) {
+		rep(j, 0, res[i].size()) {
+			cout << res[i][j] << " ";
+		}
+		cout << "\n";
+	}
 }
 
 int main() {

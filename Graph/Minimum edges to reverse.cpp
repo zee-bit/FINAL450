@@ -46,79 +46,51 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-struct node {
-	int a;
-	int b;
-	int wt;
-	node(int A, int B, int W) {
-		a = A;
-		b = B;
-		wt = W;
-	}
-};
-
-bool comparator(node a, node b) {
-	return a.wt < b.wt;
-}
-
-int findPar(int a, vector<int> &parent) {
-	if(parent[a] == a) return a;
-	return findPar(parent[a], parent);
-}
-
-void union(int a, int b, vector<int> &parent) {
-	int u = findPar(a, parent);
-	int v = findPar(b, parent);
-
-	if(rank[u] > rank[v])
-		parent[v] = u;
-	else if(rank[v] > rank[u])
-		parent[u] = v;
-	else {
-		parent[u] = v;
-		rank[v]++;
-	}
-}
-
-void solve() {
+int solve() {
 	int n, m;
 	cin >> n >> m;
+	int src, des;
+	cin >> src >> des;
+	vector<vector<pair<int, int>>> adj(n);
 
-	vector<node> edges(n);
 	rep(i, 0, m) {
-		int u, v, wt;
-		cin >> u >> v >> wt;
-		edges.push_back(node(u, v, wt));
+		int a, b;
+		cin >> a >> b;
+		adj[a].push_back({b, 0});
+		adj[b].push_back({a, 1});
 	}
 
-	sort(all(edges), comparator);
-	vector<int> par(n), rank(n, 0);
-	rep(i, 0, n) par[i] = i;
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+	vector<int> dis(n, inf);
+	pq.push({0, src});
+	dis[src] = 0;
 
-	int cost = 0;
-	vector<pair<int, int>> mst;
-	for(auto edge : edges) {
-		if(findPar(edge.a, par) != findPar(edge.b, par)) {
-			union(edge.a, edge.b, par);
-			mst.push_back({edge.a, edge.b});
-			cost += edge.wt;
+	while(!pq.empty()) {
+		int curr = pq.top().second;
+		int cost = pq.top().first;
+		pq.pop();
+
+		for(auto next : adj[curr]) {
+			if(cost + next.second < dis[next.first]) {
+				dis[next.first] = cost + next.second;
+				pq.push({dis[next.first], next.first});
+			}
 		}
 	}
-
-	cout << cost << "\n";
-	for(auto it : mst) cout << it.a << " " << it.b << "\n";
+	if(dis[des] == inf) return -1;
+	return dis[des];
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("input.txt", "r", stdin);
-  		freopen("output.txt", "w", stdout);
+  		freopen("../input.txt", "r", stdin);
+  		freopen("../output.txt", "w", stdout);
 	#endif
 	int t = 1;
 	cin >> t;
 	while(t--)
-		solve();
+		cout << solve() << "\n";
 	return 0;
 }
 

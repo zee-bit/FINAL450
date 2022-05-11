@@ -46,77 +46,49 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-struct node {
-	int a;
-	int b;
-	int wt;
-	node(int A, int B, int W) {
-		a = A;
-		b = B;
-		wt = W;
-	}
-};
+void dfs(int node, ll &cnt, vector<bool> &vis, vector<vector<int>> &adj) {
+	vis[node] = true;
+	cnt++;
 
-bool comparator(node a, node b) {
-	return a.wt < b.wt;
-}
-
-int findPar(int a, vector<int> &parent) {
-	if(parent[a] == a) return a;
-	return findPar(parent[a], parent);
-}
-
-void union(int a, int b, vector<int> &parent) {
-	int u = findPar(a, parent);
-	int v = findPar(b, parent);
-
-	if(rank[u] > rank[v])
-		parent[v] = u;
-	else if(rank[v] > rank[u])
-		parent[u] = v;
-	else {
-		parent[u] = v;
-		rank[v]++;
+	for(auto to : adj[node]) {
+		if(!vis[to])
+			dfs(to, cnt, vis, adj);
 	}
 }
 
 void solve() {
-	int n, m;
+	ll n, m;
 	cin >> n >> m;
+	ll ans = n * (n-1) / 2;
+	vector<vector<int>> adj(n);
 
-	vector<node> edges(n);
 	rep(i, 0, m) {
-		int u, v, wt;
-		cin >> u >> v >> wt;
-		edges.push_back(node(u, v, wt));
+		int u, v;
+		cin >> u >> v;
+		adj[u].push_back(v);
+		adj[v].push_back(u);
 	}
 
-	sort(all(edges), comparator);
-	vector<int> par(n), rank(n, 0);
-	rep(i, 0, n) par[i] = i;
-
-	int cost = 0;
-	vector<pair<int, int>> mst;
-	for(auto edge : edges) {
-		if(findPar(edge.a, par) != findPar(edge.b, par)) {
-			union(edge.a, edge.b, par);
-			mst.push_back({edge.a, edge.b});
-			cost += edge.wt;
+	vector<bool> vis(n, false);
+	rep(i, 0, n) {
+		if(!vis[i]) {
+			ll size = 0;
+			dfs(i, size, vis, adj);
+			ans -= (size * (size - 1)) / 2;
 		}
 	}
 
-	cout << cost << "\n";
-	for(auto it : mst) cout << it.a << " " << it.b << "\n";
+	cout << ans << "\n";
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("input.txt", "r", stdin);
-  		freopen("output.txt", "w", stdout);
+  		freopen("../input.txt", "r", stdin);
+  		freopen("../output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	cin >> t;
+	// cin >> t;
 	while(t--)
 		solve();
 	return 0;

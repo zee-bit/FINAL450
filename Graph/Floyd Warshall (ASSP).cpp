@@ -46,67 +46,35 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-struct node {
-	int a;
-	int b;
-	int wt;
-	node(int A, int B, int W) {
-		a = A;
-		b = B;
-		wt = W;
-	}
-};
-
-bool comparator(node a, node b) {
-	return a.wt < b.wt;
-}
-
-int findPar(int a, vector<int> &parent) {
-	if(parent[a] == a) return a;
-	return findPar(parent[a], parent);
-}
-
-void union(int a, int b, vector<int> &parent) {
-	int u = findPar(a, parent);
-	int v = findPar(b, parent);
-
-	if(rank[u] > rank[v])
-		parent[v] = u;
-	else if(rank[v] > rank[u])
-		parent[u] = v;
-	else {
-		parent[u] = v;
-		rank[v]++;
-	}
-}
-
 void solve() {
 	int n, m;
 	cin >> n >> m;
+	vector<vector<int>> weight(n, vector<int>(n, -1));
 
-	vector<node> edges(n);
 	rep(i, 0, m) {
-		int u, v, wt;
-		cin >> u >> v >> wt;
-		edges.push_back(node(u, v, wt));
+		int a, b, wt;
+		cin >> a >> b >> wt;
+		weight[a][b] = wt;
 	}
 
-	sort(all(edges), comparator);
-	vector<int> par(n), rank(n, 0);
-	rep(i, 0, n) par[i] = i;
+	for(int k = 0; k < n; k++) {
+        for(int i = 0; i < n; i++) {
+	        for(int j = 0; j < n; j++) {
+	            if(i == k || j == k || weight[i][k] == -1 || weight[k][j] == -1) continue;
+	            else if(weight[i][j] == -1) weight[i][j] = INT_MAX;
+	            
+	            if(weight[i][k] + weight[k][j] < weight[i][j])
+	                weight[i][j] = weight[i][k] + weight[k][j];
+	        }
+	    }
+    }
 
-	int cost = 0;
-	vector<pair<int, int>> mst;
-	for(auto edge : edges) {
-		if(findPar(edge.a, par) != findPar(edge.b, par)) {
-			union(edge.a, edge.b, par);
-			mst.push_back({edge.a, edge.b});
-			cost += edge.wt;
-		}
-	}
-
-	cout << cost << "\n";
-	for(auto it : mst) cout << it.a << " " << it.b << "\n";
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            cout << weight[i][j] << " ";
+        }
+        cout << "\n";
+    }
 }
 
 int main() {

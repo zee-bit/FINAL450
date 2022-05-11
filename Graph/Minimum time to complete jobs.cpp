@@ -57,16 +57,16 @@ void solve() {
 	}
 
 	queue<int> q;
-    vector<int> degree(n+1, 0);
+    vector<int> indegree(n+1, 0);
     vector<vector<int>> adj(n+1);
     
     for(auto edge : edges) {
         adj[edge[0]].push_back(edge[1]);
-        degree[edge[1]]++;
+        indegree[edge[1]]++;
     }
     
     for(int i = 1; i <= n; i++) {
-        if(degree[i] == 0)
+        if(indegree[i] == 0)
             q.push(i);
     }
     
@@ -79,8 +79,8 @@ void solve() {
             ans[curr-1] = t;
             
             for(int next : adj[curr]) {
-                degree[next]--;
-                if(degree[next] == 0)
+                indegree[next]--;
+                if(indegree[next] == 0)
                     q.push(next);
             }
         }

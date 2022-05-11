@@ -46,79 +46,55 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-struct node {
-	int a;
-	int b;
-	int wt;
-	node(int A, int B, int W) {
-		a = A;
-		b = B;
-		wt = W;
-	}
-};
-
-bool comparator(node a, node b) {
-	return a.wt < b.wt;
-}
-
-int findPar(int a, vector<int> &parent) {
-	if(parent[a] == a) return a;
-	return findPar(parent[a], parent);
-}
-
-void union(int a, int b, vector<int> &parent) {
-	int u = findPar(a, parent);
-	int v = findPar(b, parent);
-
-	if(rank[u] > rank[v])
-		parent[v] = u;
-	else if(rank[v] > rank[u])
-		parent[u] = v;
-	else {
-		parent[u] = v;
-		rank[v]++;
-	}
-}
-
-void solve() {
+int solve() {
 	int n, m;
 	cin >> n >> m;
+	vector<vector<pair<int, int>>> adj(n);
 
-	vector<node> edges(n);
 	rep(i, 0, m) {
 		int u, v, wt;
 		cin >> u >> v >> wt;
-		edges.push_back(node(u, v, wt));
+		adj[u].pb({v, wt});
 	}
 
-	sort(all(edges), comparator);
-	vector<int> par(n), rank(n, 0);
-	rep(i, 0, n) par[i] = i;
-
-	int cost = 0;
-	vector<pair<int, int>> mst;
-	for(auto edge : edges) {
-		if(findPar(edge.a, par) != findPar(edge.b, par)) {
-			union(edge.a, edge.b, par);
-			mst.push_back({edge.a, edge.b});
-			cost += edge.wt;
-		}
-	}
-
-	cout << cost << "\n";
-	for(auto it : mst) cout << it.a << " " << it.b << "\n";
+	vector<int> price(n, INT_MAX);
+    queue<pair<int, int>> q;
+    q.push({0, src});
+    price[src] = 0;
+    
+    while(!q.empty()) {
+        int sz = q.size();
+        while(sz--) {
+            int curr = q.front().second;
+            int cost = q.front().first;
+            q.pop();
+            
+            if(k < 0) break;
+            
+            for(auto &[v, wt] : adj[curr]) {
+                if(cost + wt < price[v]) {
+                    price[v] = cost + wt;
+                    q.push({price[v], v});
+                }
+            }
+        }
+        k--;
+    }
+    
+    if(price[dst] == INT_MAX) return -1;
+    return price[dst];
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("input.txt", "r", stdin);
-  		freopen("output.txt", "w", stdout);
+  		freopen("../input.txt", "r", stdin);
+  		freopen("../output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	cin >> t;
+	// cin >> t;
 	while(t--)
-		solve();
+		cout << solve();
 	return 0;
 }
 

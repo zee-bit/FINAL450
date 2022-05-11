@@ -57,29 +57,6 @@ struct node {
 	}
 };
 
-bool comparator(node a, node b) {
-	return a.wt < b.wt;
-}
-
-int findPar(int a, vector<int> &parent) {
-	if(parent[a] == a) return a;
-	return findPar(parent[a], parent);
-}
-
-void union(int a, int b, vector<int> &parent) {
-	int u = findPar(a, parent);
-	int v = findPar(b, parent);
-
-	if(rank[u] > rank[v])
-		parent[v] = u;
-	else if(rank[v] > rank[u])
-		parent[u] = v;
-	else {
-		parent[u] = v;
-		rank[v]++;
-	}
-}
-
 void solve() {
 	int n, m;
 	cin >> n >> m;
@@ -91,22 +68,24 @@ void solve() {
 		edges.push_back(node(u, v, wt));
 	}
 
-	sort(all(edges), comparator);
-	vector<int> par(n), rank(n, 0);
-	rep(i, 0, n) par[i] = i;
+	vector<int> dist(n, 1000000);
 
-	int cost = 0;
-	vector<pair<int, int>> mst;
-	for(auto edge : edges) {
-		if(findPar(edge.a, par) != findPar(edge.b, par)) {
-			union(edge.a, edge.b, par);
-			mst.push_back({edge.a, edge.b});
-			cost += edge.wt;
-		}
-	}
-
-	cout << cost << "\n";
-	for(auto it : mst) cout << it.a << " " << it.b << "\n";
+	for(int i = 0; i < n-1; i++) {
+	    for(auto it : edges) {
+            if(dist[it.a] + it.wt < dist[it.b]) {
+                dist[it.b] = dist[it.a] + it.wt;
+            }
+        }
+    }
+    
+    for(auto it : edges) {
+        if(dist[it.a] + it.wt < dist[it.b]) {
+            cout << "Negative cycle present\n";
+            return;
+        }
+    }
+	
+	cout << "No negative cycle\n";
 }
 
 int main() {
@@ -116,7 +95,7 @@ int main() {
   		freopen("output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	cin >> t;
+	// cin >> t;
 	while(t--)
 		solve();
 	return 0;

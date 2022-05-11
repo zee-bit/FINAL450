@@ -46,77 +46,65 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-struct node {
-	int a;
-	int b;
-	int wt;
-	node(int A, int B, int W) {
-		a = A;
-		b = B;
-		wt = W;
-	}
-};
+int timer = 1;
 
-bool comparator(node a, node b) {
-	return a.wt < b.wt;
-}
+void precompute(int node, vector<bool> &vis, vector<vector<int>> &adj, unordered_map<int, pair<int, int>> &mp) {
+	mp[node] = {timer++, -1};
+	vis[node] = true;
 
-int findPar(int a, vector<int> &parent) {
-	if(parent[a] == a) return a;
-	return findPar(parent[a], parent);
-}
-
-void union(int a, int b, vector<int> &parent) {
-	int u = findPar(a, parent);
-	int v = findPar(b, parent);
-
-	if(rank[u] > rank[v])
-		parent[v] = u;
-	else if(rank[v] > rank[u])
-		parent[u] = v;
-	else {
-		parent[u] = v;
-		rank[v]++;
-	}
-}
-
-void solve() {
-	int n, m;
-	cin >> n >> m;
-
-	vector<node> edges(n);
-	rep(i, 0, m) {
-		int u, v, wt;
-		cin >> u >> v >> wt;
-		edges.push_back(node(u, v, wt));
-	}
-
-	sort(all(edges), comparator);
-	vector<int> par(n), rank(n, 0);
-	rep(i, 0, n) par[i] = i;
-
-	int cost = 0;
-	vector<pair<int, int>> mst;
-	for(auto edge : edges) {
-		if(findPar(edge.a, par) != findPar(edge.b, par)) {
-			union(edge.a, edge.b, par);
-			mst.push_back({edge.a, edge.b});
-			cost += edge.wt;
+	for(auto next : adj[node]) {
+		if(!vis[next]) {
+			precompute(next, vis, adj, mp);
 		}
 	}
 
-	cout << cost << "\n";
-	for(auto it : mst) cout << it.a << " " << it.b << "\n";
+	mp[node].second = timer++;
+}
+
+void solve() {
+	int n;
+	cin >> n;
+	vector<vector<int>> adj(n+1);
+
+	rep(i, 1, n) {
+		int u, v;
+		cin >> u >> v;
+		adj[u].push_back(v);
+		adj[v].push_back(u);
+	}
+
+	vector<bool> vis(n+1, false);
+	unordered_map<int, pair<int, int>> mp;
+	precompute(1, vis, adj, mp);
+
+	int q;
+	cin >> q;
+	while(q--) {
+		int a, b, c;
+		cin >> a >> b >> c;
+
+		if(a == 0) {
+			if(mp[b].first <= mp[c].first && mp[c].second <= mp[b].second)
+				cout << "YES\n";
+			else
+				cout << "NO\n";
+		} else {
+			if(mp[c].first <= mp[b].first && mp[b].second <= mp[c].second)
+				cout << "YES\n";
+			else
+				cout << "NO\n";
+		}
+	}
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("input.txt", "r", stdin);
-  		freopen("output.txt", "w", stdout);
+  		freopen("../input.txt", "r", stdin);
+  		freopen("../output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	cin >> t;
+	// cin >> t;
 	while(t--)
 		solve();
 	return 0;

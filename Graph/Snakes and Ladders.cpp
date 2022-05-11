@@ -46,79 +46,58 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-struct node {
-	int a;
-	int b;
-	int wt;
-	node(int A, int B, int W) {
-		a = A;
-		b = B;
-		wt = W;
-	}
-};
+int solve() {
+	int n;
+	cin >> n;
+	vector<vector<int>> board(n, vector<int>(n));
 
-bool comparator(node a, node b) {
-	return a.wt < b.wt;
-}
-
-int findPar(int a, vector<int> &parent) {
-	if(parent[a] == a) return a;
-	return findPar(parent[a], parent);
-}
-
-void union(int a, int b, vector<int> &parent) {
-	int u = findPar(a, parent);
-	int v = findPar(b, parent);
-
-	if(rank[u] > rank[v])
-		parent[v] = u;
-	else if(rank[v] > rank[u])
-		parent[u] = v;
-	else {
-		parent[u] = v;
-		rank[v]++;
-	}
-}
-
-void solve() {
-	int n, m;
-	cin >> n >> m;
-
-	vector<node> edges(n);
-	rep(i, 0, m) {
-		int u, v, wt;
-		cin >> u >> v >> wt;
-		edges.push_back(node(u, v, wt));
-	}
-
-	sort(all(edges), comparator);
-	vector<int> par(n), rank(n, 0);
-	rep(i, 0, n) par[i] = i;
-
-	int cost = 0;
-	vector<pair<int, int>> mst;
-	for(auto edge : edges) {
-		if(findPar(edge.a, par) != findPar(edge.b, par)) {
-			union(edge.a, edge.b, par);
-			mst.push_back({edge.a, edge.b});
-			cost += edge.wt;
+	rep(i, 0, n) {
+		rep(j, 0, n) {
+			cin >> board[i][j];
 		}
 	}
 
-	cout << cost << "\n";
-	for(auto it : mst) cout << it.a << " " << it.b << "\n";
+	queue<int> q;
+    q.push(1);
+    
+    int moves = 1;
+    while(!q.empty()) {
+        int sz = q.size();
+        while(sz--) {
+            int curr = q.front(); q.pop();
+                            
+            for(int k = curr + 1; k <= min(curr + 6, n*n); k++) {
+                int x = (k-1) / n, y = (k-1) % n, next = k;
+                
+                if(x & 1) y = n - y - 1;
+                x = n - x - 1;
+                
+                if(board[x][y] == 0) continue;
+                
+                if(board[x][y] != -1)
+                    next = board[x][y];
+                
+                if(next == n*n) return moves;
+                board[x][y] = 0;
+                q.push(next);
+            }
+        }
+        moves++;
+    }
+    
+    return -1;
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("input.txt", "r", stdin);
-  		freopen("output.txt", "w", stdout);
+  		freopen("../input.txt", "r", stdin);
+  		freopen("../output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	cin >> t;
+	// cin >> t;
 	while(t--)
-		solve();
+		cout << solve();
 	return 0;
 }
 

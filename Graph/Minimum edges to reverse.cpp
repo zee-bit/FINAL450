@@ -71,9 +71,10 @@ int solve() {
 		pq.pop();
 
 		for(auto next : adj[curr]) {
-			if(cost + next.second < dis[next.first]) {
-				dis[next.first] = cost + next.second;
-				pq.push({dis[next.first], next.first});
+			int childWt = next.second, childNode = next.first;
+			if(cost + childWt < dis[childNode]) {
+				dis[childNode] = cost + childWt;
+				pq.push({dis[childNode], childNode});
 			}
 		}
 	}

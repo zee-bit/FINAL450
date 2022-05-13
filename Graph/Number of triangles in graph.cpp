@@ -26,10 +26,10 @@ const int dy4[]={0,1,0,-1};
 #define vvi vector<vector<int> >
 #define all(v) v.begin(), v.end()
 #define rall(v) v.rbegin(), v.rend()
-const int dx8[]={-1,-1,-1,0,1,1,1,0,-1};
-const int dy8[]={-1,0,1,1,1,0,-1,-1,-1};
+const int dx8[]={-1,-1,-1,0,1,1,1,0};
+const int dy8[]={-1,0,1,1,1,0,-1,-1};
 #define ust unordered_set<ll, custom_hash>
-#define rep(i, a, b) for(ll i = a; i < b; i++)
+#define rep(i, a, b) for(ll i = a; i < ll(b); i++)
 #define umll unordered_map<ll, ll, custom_hash>
 #define fast ios_base::sync_with_stdio(false);cin.tie(NULL);
 struct custom_hash { size_t operator()(uint64_t x) const { static const uint64_t FIXED_RANDOM =
@@ -41,39 +41,61 @@ ll BS(ll a[],ll s,ll n,ll val) {ll mid,beg=s,end=n-1; while(beg<=end)
 {mid=(beg+end)/2; if(val==a[mid]){break;} else if(val>a[mid]){beg=mid+1;}else{end=mid-1;}} return mid;}
 inline ll mul(ll x,ll y,ll m){ll z=1LL*x*y;if (z>=m){z%=m;} return z;}
 ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,m);}return r;}
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
 
 //========================================XXXXXXXXXXXXXXXX=======================================
-vector<pair<int, int> > ar[maxN];
 
-void dijkstra() {
-	int n, m, a, b, w;
-	rep(i, 0, n) ar[i].clear();
+// O(n^3)
+void solve() {
+	int n, m;
 	cin >> n >> m;
-	rep(i, 0, m) {
-		cin >> a >> b >> w;
-		ar[a].pb({b, w});
-		ar[b].pb({a, w});
-	}
-	priority_queue<pair<int, int>, vector<pair<int, int> >, greater<pair<int, int> > > pq;
-	vector<int> dis(n + 1, inf);
-	pq.push({0, 1});
-	dis[1] = 0;
+	vector<vector<int>> adj(n, vector<int>(n, 0));
 
-	while(!pq.empty()) {
-		int currNode = pq.top().ss;
-		int currDis = pq.top().ff;
-		pq.pop();
-		for(auto child : ar[currNode]) {
-			int childWt = child.ss, childNode = child.ff;
-			if(currDis + childWt < dis[childNode]) {
-				dis[childNode] = currDis + childWt;
-				pq.push({dis[childNode], childNode});
+	for(int i = 0; i < m; i++) {
+		int a, b;
+		cin >> a >> b;
+		adj[a][b] = 1;
+		adj[b][a] = 1; // If undirected
+	}
+
+	int cnt = 0;
+	for(int i = 0; i < n; i++) {
+		for(int j = 0; j < n; j++) {
+			for(int k = 0; k < n; k++) {
+				if(adj[i][j] && adj[j][k] && adj[k][i])
+					cnt++;
 			}
 		}
 	}
-	rep(i, 1, n + 1) {
-		cout << dis[i] << " ";
+
+	cout << cnt / 6 << "\n";
+	// cout << cnt / 3 << "\n"; If directed graph
+}
+
+// o(n^2)
+void solve2() {
+	int n, m;
+	cin >> n >> m;
+	vector<bitset<n>> adj(n);
+
+	for(int i = 0; i < m; i++) {
+		int a, b;
+		cin >> a >> b;
+		adj[a][b] = 1;
+		adj[b][a] = 1; // If undirected
 	}
+
+	int cnt = 0;
+	for(int i = 0; i < n; i++) {
+		for(int j = 0; j < n; j++) {
+			if(adj[i][j] == 1 && i != j) {
+				auto mask = adj[i] & adj[j];
+				cnt += mask.count();
+			}
+		}
+	}
+	cout << cnt / 6;
 }
 
 int main() {
@@ -85,6 +107,8 @@ int main() {
 	int t = 1;
 	cin >> t;
 	while(t--)
-		dijkstra();
+		solve();
 	return 0;
 }
+
+#pragma GCC diagnostic pop

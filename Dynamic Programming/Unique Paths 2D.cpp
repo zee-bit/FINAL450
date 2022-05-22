@@ -46,82 +46,52 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMinCoins(int idx, int amt, vector<int> &nums, vector<vector<int>> &dp) {
-    if(idx == 0) {
-        if(amt % nums[idx] == 0) return amt / nums[idx];
-        return 1e8;
-    }
-    
-    if(dp[idx][amt] != -1) return dp[idx][amt];
-    
-    int take = 1e8;
-    if(amt - nums[idx] >= 0)
-        take = 1 + getMinCoins(idx, amt - nums[idx], nums, dp);
-    int skip = getMinCoins(idx - 1, amt, nums, dp);
-    return dp[idx][amt] = min(take, skip);
+int f(int i, int j, vector<vector<int>> &dp) {
+	if(i == 0 && j == 0) return 1;
+	if(i < 0 || j < 0) return 0;
+	
+	if(dp[i][j] != -1) return dp[i][j];
+	
+	int up = f(i-1, j, dp);
+	int left = f(i, j-1, dp);
+	return dp[i][j] = up + left;
 }
 
-int numWays(int idx, int amt, vector<int> &nums, vector<vector<int>> &dp) {
-    if(idx == 0) {
-        return amt % nums[idx] == 0;
-    }
-    
-    if(dp[idx][amt] != -1) return dp[idx][amt];
-    
-    int skip = numWays(idx - 1, amt, nums, dp);
-    int take = 0;
-    if(nums[idx] <= amt)
-        take = numWays(idx, amt - nums[idx], nums, dp);
-    
-    return dp[idx][amt] = skip + take;
-}
+void solve() {
+	int m, n;
+	cin >> m >> n;
 
-int solve() {
-	int n, amt;
-	cin >> n >> amt;
-	vector<int> arr(n);
-	rep(i, 0, n) {cin >> arr[i];}
+	// Memoization (Top-down)
+	vector<vector<int>> dp(m, vector<int>(n, -1));
+	return f(m-1, n-1, dp);
+	
 
-	// 1. Min coins needed to get required amount
-	// Memoization
-	vector<vector<int>> dp(n, vector<int>(amount + 1, -1));
-	int minCoins = getMinCoins(n-1, amount, arr, dp);
-	cout << minCoins >= 1e8 ? -1 : minCoins;
-
-	// Optimized Tabulation
-	vector<int> dp(amt+1, INT_MAX);
-	dp[0] = 0;
-	for(int i = 1; i <= amt; i++) {
+	// Tabulation (Bottom-up)
+	for(int i = 0; i < m; i++) {
 		for(int j = 0; j < n; j++) {
-			if(i - arr[j] >= 0 && dp[i - arr[j]] != INT_MAX)
-				dp[i] = min(dp[i], 1 + dp[i - arr[j]]);
+			if(i == 0 && j == 0) {
+				dp[i][j] = 1;
+				continue;
+			}
+			int up = 0, left = 0;
+			if(i > 0) up = dp[i-1][j];
+			if(j > 0) left = dp[i][j-1];
+			dp[i][j] = up + left;
 		}
 	}
-	cout << dp[amt] == INT_MAX ? -1 : dp[amt];
-
-
-	// 2. Number of ways to get required amount
-	vector<int> dp(amt + 1, 0);
-	dp[0] = 1; // for amt=0, {} is one solution
-	for(int i = 0; i < n; i++) {
-		for(int j = 1; j <= amt; j++) {
-			if(j - arr[i] >= 0)
-				dp[j] += dp[j - arr[i]];
-		}
-	}
-	cout << dp[amt];
+	return dp[m-1][n-1];
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("../input.txt", "r", stdin);
-  		freopen("../output.txt", "w", stdout);
+  		freopen("input.txt", "r", stdin);
+  		freopen("output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	// cin >> t;
+	cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

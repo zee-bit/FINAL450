@@ -46,70 +46,45 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMinCoins(int idx, int amt, vector<int> &nums, vector<vector<int>> &dp) {
-    if(idx == 0) {
-        if(amt % nums[idx] == 0) return amt / nums[idx];
-        return 1e8;
-    }
-    
-    if(dp[idx][amt] != -1) return dp[idx][amt];
-    
-    int take = 1e8;
-    if(amt - nums[idx] >= 0)
-        take = 1 + getMinCoins(idx, amt - nums[idx], nums, dp);
-    int skip = getMinCoins(idx - 1, amt, nums, dp);
-    return dp[idx][amt] = min(take, skip);
+int maxCost(int idx, int W, vector<int> &price, vector<vector<int>> &dp) {
+	if(idx == 0) {
+		return W * price[idx];
+	}
+	
+	if(dp[idx][W] != -1) return dp[idx][W];
+	
+	int skip = 0 + maxCost(idx - 1, W, price, dp);
+	int take = INT_MIN;
+	if(idx + 1 <= W)
+		take = price[idx] + maxCost(idx, W - idx - 1, price, dp);
+	
+	return dp[idx][W] = max(take, skip);
 }
 
-int numWays(int idx, int amt, vector<int> &nums, vector<vector<int>> &dp) {
-    if(idx == 0) {
-        return amt % nums[idx] == 0;
-    }
-    
-    if(dp[idx][amt] != -1) return dp[idx][amt];
-    
-    int skip = numWays(idx - 1, amt, nums, dp);
-    int take = 0;
-    if(nums[idx] <= amt)
-        take = numWays(idx, amt - nums[idx], nums, dp);
-    
-    return dp[idx][amt] = skip + take;
-}
+void solve() {
+	int n;
+	cin >> n;
+	vector<int> price(n);
+	rep(i, 0, n) cin >> price[i];
 
-int solve() {
-	int n, amt;
-	cin >> n >> amt;
-	vector<int> arr(n);
-	rep(i, 0, n) {cin >> arr[i];}
-
-	// 1. Min coins needed to get required amount
 	// Memoization
-	vector<vector<int>> dp(n, vector<int>(amount + 1, -1));
-	int minCoins = getMinCoins(n-1, amount, arr, dp);
-	cout << minCoins >= 1e8 ? -1 : minCoins;
+	vector<vector<int>> dp(n, vector<int>(n+1, -1));
+	cout << maxCost(n-1, n, price, dp);
 
-	// Optimized Tabulation
-	vector<int> dp(amt+1, INT_MAX);
-	dp[0] = 0;
-	for(int i = 1; i <= amt; i++) {
-		for(int j = 0; j < n; j++) {
-			if(i - arr[j] >= 0 && dp[i - arr[j]] != INT_MAX)
-				dp[i] = min(dp[i], 1 + dp[i - arr[j]]);
+	// Tabulation
+	for(int i = 0; i <= n; i++) dp[0][i] = i * price[0];
+	
+	for(int idx = 1; idx < n; idx++) {
+		for(int W = 0; W <= n; W++) {
+			int skip = 0 + dp[idx - 1][W];
+			int take = INT_MIN;
+			if(idx + 1 <= W)
+				take = price[idx] + dp[idx][W - idx - 1];
+
+			dp[idx][W] = max(take, skip);
 		}
 	}
-	cout << dp[amt] == INT_MAX ? -1 : dp[amt];
-
-
-	// 2. Number of ways to get required amount
-	vector<int> dp(amt + 1, 0);
-	dp[0] = 1; // for amt=0, {} is one solution
-	for(int i = 0; i < n; i++) {
-		for(int j = 1; j <= amt; j++) {
-			if(j - arr[i] >= 0)
-				dp[j] += dp[j - arr[i]];
-		}
-	}
-	cout << dp[amt];
+	cout << dp[n-1][n];
 }
 
 int main() {
@@ -121,7 +96,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

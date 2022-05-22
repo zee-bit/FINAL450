@@ -46,70 +46,24 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMinCoins(int idx, int amt, vector<int> &nums, vector<vector<int>> &dp) {
-    if(idx == 0) {
-        if(amt % nums[idx] == 0) return amt / nums[idx];
-        return 1e8;
-    }
-    
-    if(dp[idx][amt] != -1) return dp[idx][amt];
-    
-    int take = 1e8;
-    if(amt - nums[idx] >= 0)
-        take = 1 + getMinCoins(idx, amt - nums[idx], nums, dp);
-    int skip = getMinCoins(idx - 1, amt, nums, dp);
-    return dp[idx][amt] = min(take, skip);
-}
+void solve() {
+	int n;
+	cin >> n;
+	vector<int> nums(n);
+	rep(i, 0, n) cin >> nums[i];
 
-int numWays(int idx, int amt, vector<int> &nums, vector<vector<int>> &dp) {
-    if(idx == 0) {
-        return amt % nums[idx] == 0;
-    }
-    
-    if(dp[idx][amt] != -1) return dp[idx][amt];
-    
-    int skip = numWays(idx - 1, amt, nums, dp);
-    int take = 0;
-    if(nums[idx] <= amt)
-        take = numWays(idx, amt - nums[idx], nums, dp);
-    
-    return dp[idx][amt] = skip + take;
-}
+	vector<int> dp(n);
 
-int solve() {
-	int n, amt;
-	cin >> n >> amt;
-	vector<int> arr(n);
-	rep(i, 0, n) {cin >> arr[i];}
+	if(n >= 1)
+		dp[0] = nums[0];
+	if(n >= 2)
+		dp[1] = nums[0] + nums[1];
+	if(n >= 3)
+		dp[2] = max({dp[1], nums[0] + nums[2], nums[1] + nums[2]});
+	for(int i = 3; i < n; i++) 
+		dp[i] = max({dp[i-1], dp[i-2] + nums[i], dp[i-3] + nums[i] + nums[i-1]});
 
-	// 1. Min coins needed to get required amount
-	// Memoization
-	vector<vector<int>> dp(n, vector<int>(amount + 1, -1));
-	int minCoins = getMinCoins(n-1, amount, arr, dp);
-	cout << minCoins >= 1e8 ? -1 : minCoins;
-
-	// Optimized Tabulation
-	vector<int> dp(amt+1, INT_MAX);
-	dp[0] = 0;
-	for(int i = 1; i <= amt; i++) {
-		for(int j = 0; j < n; j++) {
-			if(i - arr[j] >= 0 && dp[i - arr[j]] != INT_MAX)
-				dp[i] = min(dp[i], 1 + dp[i - arr[j]]);
-		}
-	}
-	cout << dp[amt] == INT_MAX ? -1 : dp[amt];
-
-
-	// 2. Number of ways to get required amount
-	vector<int> dp(amt + 1, 0);
-	dp[0] = 1; // for amt=0, {} is one solution
-	for(int i = 0; i < n; i++) {
-		for(int j = 1; j <= amt; j++) {
-			if(j - arr[i] >= 0)
-				dp[j] += dp[j - arr[i]];
-		}
-	}
-	cout << dp[amt];
+	cout << dp[n-1];
 }
 
 int main() {
@@ -121,7 +75,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

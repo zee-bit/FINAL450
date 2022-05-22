@@ -46,70 +46,75 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int getMinCoins(int idx, int amt, vector<int> &nums, vector<vector<int>> &dp) {
-    if(idx == 0) {
-        if(amt % nums[idx] == 0) return amt / nums[idx];
-        return 1e8;
-    }
-    
-    if(dp[idx][amt] != -1) return dp[idx][amt];
-    
-    int take = 1e8;
-    if(amt - nums[idx] >= 0)
-        take = 1 + getMinCoins(idx, amt - nums[idx], nums, dp);
-    int skip = getMinCoins(idx - 1, amt, nums, dp);
-    return dp[idx][amt] = min(take, skip);
+int dfs(int r, int c1, int c2, vector<vector<int>> &arr, vector<vector<vector<int>>> &dp) {
+	if(c1 < 0 || c2 < 0 || c1 >= n || c2 >= n)
+		return -1e8;
+	if(r == m-1) {
+		if(c1 == c2) return arr[r][c1];
+		else return arr[r][c1] + arr[r][c2];
+	}
+
+	if(dp[r][c1][c2] != -1) return dp[r][c1][c2];
+
+	int ans = INT_MIN;
+	for(int i = -1; i <= 1; i++) {
+		for(int j = -1; j <= 1; j++) {
+			int val = dfs(r+1, c1+i, c2+j, arr, dp);
+			if(c1 == c2) val += arr[r][c1];
+			else val += arr[r][c1] + arr[r][c2];
+			ans = max(ans, val);
+		}
+	}
+	return dp[r][c1][c2] = ans;
 }
 
-int numWays(int idx, int amt, vector<int> &nums, vector<vector<int>> &dp) {
-    if(idx == 0) {
-        return amt % nums[idx] == 0;
-    }
-    
-    if(dp[idx][amt] != -1) return dp[idx][amt];
-    
-    int skip = numWays(idx - 1, amt, nums, dp);
-    int take = 0;
-    if(nums[idx] <= amt)
-        take = numWays(idx, amt - nums[idx], nums, dp);
-    
-    return dp[idx][amt] = skip + take;
-}
+void solve() {
+	int m, n;
+	cin >> m >> n;
+	vector<vector<int>> grid;
+	rep(i, 0, m) {
+		rep(j, 0, n)
+			cin >> grid[i][j];
+	}
 
-int solve() {
-	int n, amt;
-	cin >> n >> amt;
-	vector<int> arr(n);
-	rep(i, 0, n) {cin >> arr[i];}
-
-	// 1. Min coins needed to get required amount
 	// Memoization
-	vector<vector<int>> dp(n, vector<int>(amount + 1, -1));
-	int minCoins = getMinCoins(n-1, amount, arr, dp);
-	cout << minCoins >= 1e8 ? -1 : minCoins;
+	vector<vector<vector<int>>> dp(m, vector<vector<int>>(n, vector<int>(n, -1)));
+	cout << dfs(0, 0, n-1, grid, dp) << "\n";
 
-	// Optimized Tabulation
-	vector<int> dp(amt+1, INT_MAX);
-	dp[0] = 0;
-	for(int i = 1; i <= amt; i++) {
-		for(int j = 0; j < n; j++) {
-			if(i - arr[j] >= 0 && dp[i - arr[j]] != INT_MAX)
-				dp[i] = min(dp[i], 1 + dp[i - arr[j]]);
+	// Tabulation
+	for(int j1 = 0; j1 < n; j1++) {
+		for(int j2 = 0; j2 < n; j2++) {
+			if(j1 == j2) dp[m-1][j1][j2] = arr[m-1][j1];
+			else dp[m-1][j1][j2] = arr[m-1][j1] + arr[m-1][j2];
 		}
 	}
-	cout << dp[amt] == INT_MAX ? -1 : dp[amt];
 
+	for(int r = m-2; r >= 0; r--) {
+		for(int j1 = 0; j1 < n; j1++) {
+			for(int j2 = 0; j2 < n; j2++) {
 
-	// 2. Number of ways to get required amount
-	vector<int> dp(amt + 1, 0);
-	dp[0] = 1; // for amt=0, {} is one solution
-	for(int i = 0; i < n; i++) {
-		for(int j = 1; j <= amt; j++) {
-			if(j - arr[i] >= 0)
-				dp[j] += dp[j - arr[i]];
+				int ans = -1e8;
+                for(int i = -1; i <= 1; i++) {
+                    for(int j = -1; j <= 1; j++) {
+                        int val = 0;
+
+                        if(j1 == j2) val += arr[r][j1];
+                        else val += arr[r][j1] + arr[r][j2];
+                        
+                        if(j1+i >= 0 and j1+i < n and j2+j >= 0 and j2+j < n)
+                            val += dp[r+1][j1+i][j2+j];
+                        else
+                            val += -1e8;
+
+                        ans = max(ans, val);
+                    }
+                }
+
+                dp[r][j1][j2] = ans;
+			}
 		}
 	}
-	cout << dp[amt];
+	cout << dp[0][n-1][n-1];
 }
 
 int main() {
@@ -121,7 +126,7 @@ int main() {
 	int t = 1;
 	// cin >> t;
 	while(t--)
-		cout << solve();
+		solve();
 	return 0;
 }
 

@@ -65,10 +65,28 @@ bool solve() {
 	sum /= 2;
 
 	// DFS (Top-down/Bottom-up???)
-	vector<vector<int>> dp(n+1, vector<int>(sum+1, -1))
+	vector<vector<int>> dp(n+1, vector<int>(sum+1, -1));
 	return canPartition(nums, 0, n, sum, dp);
 
-	// DP
+	// DP (using 2-D array)
+	vector<vector<bool>> dp(n, vector<bool>(sum+1, false));
+	if(nums[0] <= sum) dp[0][nums[0]] = true;
+	
+	for(int i = 1; i < n; i++) {
+		for(int j = 0; j <= sum; j++) {
+			if(j == 0) dp[i][j] = true;
+			else {
+				int skip = dp[i-1][j];
+				int take = false;
+				if(nums[i] <= j)
+					take = dp[i-1][j-nums[i]];
+				dp[i][j] = skip | take;
+			}
+		}
+	}
+	cout << dp[n-1][sum];
+
+	// DP (using 1-D array)
 	vector<bool> dp(sum+1, false);
     dp[0] = true;
     for(int i = 0; i < n; i++) {

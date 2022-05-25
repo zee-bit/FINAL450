@@ -46,31 +46,39 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
-		return 0;
-	}
-
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
-
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
-
-	return dp[idx][prod] = excl + incl;
+int maxPath(int i, int j, vector<vector<int>> &mat, vector<vector<int>> &dp) {
+    if(j < 0 || j >= mat[0].size())
+        return -1e9;
+    if(i == 0)
+        return mat[i][j];
+    
+    if(dp[i][j] != -1) return dp[i][j];
+    
+    int up = maxPath(i-1, j, mat, dp);
+    int up_l = maxPath(i-1, j-1, mat, dp);
+    int up_r = maxPath(i-1, j+1, mat, dp);
+    
+    return dp[i][j] = mat[i][j] + max({up, up_l, up_r});
 }
 
 void solve() {
-	int n, k;
-	cin >> n >> k;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
+	int N;
+	cin >> N;
+	vector<vector<int>> Matrix(n, vector<int>(N));
 
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	rep(i, 0, N) {
+		rep(j, 0, N) {
+			cin >> Matrix[i][j];
+		}
+	}
+
+	vector<vector<int>> dp(N, vector<int>(N, -1));
+        
+    int ans = INT_MIN;
+    for(int j = 0; j < N; j++) {
+        ans = max(ans, maxPath(N-1, j, Matrix, dp));
+    }
+    cout << ans;
 }
 
 int main() {

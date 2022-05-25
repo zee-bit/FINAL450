@@ -46,31 +46,44 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
-		return 0;
-	}
-
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
-
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
-
-	return dp[idx][prod] = excl + incl;
-}
-
 void solve() {
-	int n, k;
-	cin >> n >> k;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
+	string a, b;
+	cin >> a >> b;
+	int A = a.length(), B = b.length();
 
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	vector<vector<int>> dp(A+1, vector<int>(B+1, 0));
+    
+    for(int i = 1; i <= A; i++) {
+        for(int j = 1; j <= B; j++) {
+            if(a[i-1] == b[j-1])
+                dp[i][j] = 1 + dp[i-1][j-1];
+            else
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+
+    string scs = "";
+    int i = A, j = B;
+    while(i > 0 && j > 0) {
+        if(a[i-1] == b[j-1]) {
+            scs = a[i-1] + scs;
+            i--; j--;
+        }
+        else {
+            if(dp[i][j-1] < dp[i-1][j]) {
+                scs = a[i-1] + scs;
+                i--;
+            }
+            else {
+                scs = b[j-1] + scs;
+                j--;
+            }
+        }
+    }
+    while(i-- > 0) scs = a[i] + scs;
+    while(j-- > 0) scs = b[j] + scs;
+    
+    cout << scs << "\n";
 }
 
 int main() {
@@ -80,7 +93,7 @@ int main() {
   		freopen("../output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	// cin >> t;
+	cin >> t;
 	while(t--)
 		solve();
 	return 0;

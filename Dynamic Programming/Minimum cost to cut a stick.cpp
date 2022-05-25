@@ -46,31 +46,30 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
-		return 0;
-	}
-
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
-
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
-
-	return dp[idx][prod] = excl + incl;
+int cut(int left, int right, vector<int> &arr, vector<vector<int>> &dp) {
+    if(right - left <= 1) return 0;
+    
+    if(dp[left][right] != -1) return dp[left][right];
+    
+    int minC = INT_MAX;
+    for(int c = left + 1; c < right; c++) {
+        minC = min(minC, arr[right] - arr[left] + cut(left, c, arr, dp) + cut(c, right, arr, dp));
+    }
+    
+    return dp[left][right] = minC;
 }
 
 void solve() {
-	int n, k;
-	cin >> n >> k;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
-
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	int n, c;
+	cin >> n >> c;
+	vector<int> cuts(c);
+	rep(i, 0, c) cin >> cuts[i];
+	cuts.push_back(0); cuts.push_back(n);
+    
+    vector<vector<int>> dp(C, vector<int>(C, -1));
+    
+    sort(cuts.begin(), cuts.end());
+    cout << cut(0, cuts.size()-1, cuts, dp);
 }
 
 int main() {

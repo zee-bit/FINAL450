@@ -46,31 +46,21 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
-		return 0;
+void solve() {
+	string s;
+	cin >> s;
+	int n = s.length();
+
+	int val = 0, ans = INT_MIN;
+	for(int i = 0; i < n; i++) {
+		if(s[i] == '0') val++;
+		else val--;
+		ans = max(ans, val);
+		id(val < 0) val = 0;
 	}
 
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
-
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
-
-	return dp[idx][prod] = excl + incl;
-}
-
-void solve() {
-	int n, k;
-	cin >> n >> k;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
-
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	if(ans < 0) cout << -1;
+	else cout << ans;
 }
 
 int main() {

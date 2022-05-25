@@ -46,31 +46,34 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
-		return 0;
-	}
-
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
-
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
-
-	return dp[idx][prod] = excl + incl;
+int Cost(int idx, int w, vector<int> &cost, vector<vector<int>> &dp) {
+    if(w < 0) return 1e8;
+    if(w == 0) return 0;
+    if(idx == 0) {
+        if(cost[idx] == -1) return 1e8;
+        return cost[idx] * w;
+    }
+    
+    if(dp[idx][w] != -1) return dp[idx][w];
+    
+    int skip = Cost(idx - 1, w, cost, dp);
+    int take = 1e8;
+    if(cost[idx] != -1 && idx + 1 <= w)
+        take = cost[idx] + Cost(idx, w - idx - 1, cost, dp);
+    
+    return dp[idx][w] = min(skip, take);
 }
 
-void solve() {
-	int n, k;
-	cin >> n >> k;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
+int solve() {
+	int N, W;
+	cin >> N >> W;
+	vector<int> cost(N);
+	rep(i, 0, N) cin >> cost[i];
 
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	vector<vector<int>> dp(N+1, vector<int>(W+1, -1));
+	int min_cost = Cost(N-1, W, cost, dp);
+	if(min_cost >= 1e8) return -1;
+	return min_cost;
 }
 
 int main() {
@@ -80,9 +83,9 @@ int main() {
   		freopen("../output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	// cin >> t;
+	cin >> t;
 	while(t--)
-		solve();
+		cout << solve();
 	return 0;
 }
 

@@ -46,31 +46,29 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
-		return 0;
+void solve() {
+	int n;
+	cin >> n;
+	vector<vector<int>> arr;
+	rep(i, 0, n) {
+		int w, h;
+		cin >> w >> h;
+		arr.push_back({w, h});
 	}
 
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
-
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
-
-	return dp[idx][prod] = excl + incl;
-}
-
-void solve() {
-	int n, k;
-	cin >> n >> k;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
-
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	sort(arr.begin(), arr.end(), [&](vector<int> &a, vector<int> &b) {
+        if(a[0] == b[0]) return a[1] > b[1];
+        return a[0] < b[0];
+    });
+    
+    vector<int> dp;
+    for(int i = 0; i < n; i++) {
+        int left = lower_bound(dp.begin(), dp.end(), arr[i][1]) - dp.begin();
+        if(left == dp.size()) dp.push_back(arr[i][1]);
+        else dp[left] = arr[i][1];
+    }
+    
+    return dp.size();
 }
 
 int main() {

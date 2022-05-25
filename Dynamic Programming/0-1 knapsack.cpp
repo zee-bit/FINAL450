@@ -46,31 +46,47 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
-		return 0;
-	}
-
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
-
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
-
-	return dp[idx][prod] = excl + incl;
+int knapsack(int n, int w, int wt[], int val[], vector<vector<int>> &dp) {
+    if(n == 0) {
+        if(wt[0] > w) return 0;
+        return val[0];
+    }
+    
+    if(dp[n][w] != -1) return dp[n][w];
+    
+    int skip = knapsack(n-1, w, wt, val, dp);
+    int take = INT_MIN;
+    if(wt[n] <= w)
+        take = val[n] + knapsack(n-1, w-wt[n], wt, val, dp);
+    
+    return dp[n][w] = max(skip, take);
 }
 
 void solve() {
-	int n, k;
-	cin >> n >> k;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
+	// Take input here
 
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	// memoization
+	vector<vector<int>> dp(n+1, vector<int>(W+1, 0));
+ 	return knapsack(n-1, W, wt, val, dp);
+    
+ 	// tabulation
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j <= W; j++) {
+            if(i == 0) {
+                if(wt[i] <= j)
+                    dp[i][j] = val[0];
+            }
+            else {
+                int skip = dp[i-1][j];
+                int take = INT_MIN;
+                if(wt[i] <= j)
+                    take = val[i] + dp[i-1][j-wt[i]];
+                
+                dp[i][j] = max(skip, take);
+            }
+        }
+    }
+    return dp[n-1][W];
 }
 
 int main() {

@@ -46,21 +46,19 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
+int solve(int lo, int hi, vector<int> &arr, int &k, vector<vector<int>> &dp) {
+	if(lo >= hi)
 		return 0;
-	}
-
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
-
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
-
-	return dp[idx][prod] = excl + incl;
+    if(arr[hi] - arr[lo] <= k)
+        return 0;
+    
+    if(dp[lo][hi] != -1)
+        return dp[lo][hi];
+    
+    int frnt = 1 + solve(lo + 1, hi, arr, k, dp);
+    int back = 1 + solve(lo, hi - 1, arr, k, dp);
+    
+    return dp[lo][hi] = min(frnt, back);
 }
 
 void solve() {
@@ -69,8 +67,10 @@ void solve() {
 	vector<int> arr(n);
 	rep(i, 0, n) cin >> arr[i];
 
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	sort(arr.begin(), arr.end());
+    vector<vector<int>> dp(n, vector<int>(n, -1));
+    
+    cout << solve(0, n-1, arr, k, dp);
 }
 
 int main() {

@@ -46,31 +46,40 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
-		return 0;
-	}
+int ways(int n, int x, vector<int> &vals, vector<vector<int>> &dp) {
+	if(n == 0) return 1;
+	if(n < 0) return 0;
 
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
+	if(dp[n][x] != -1) return dp[n][x];
 
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
+	int ans = 0;
+	for(int i = x; i < 3; i++)
+		ans += ways(n - vals[i], i, vals, dp);
 
-	return dp[idx][prod] = excl + incl;
+	return dp[n][x] = ans;
 }
 
 void solve() {
-	int n, k;
-	cin >> n >> k;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
+	int n;
+	cin >> n;
 
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	// 2D DP [Top-down]
+	vector<int> vals = {3, 5, 10};
+	vector<vector<int>> dp(n+1, vector<int>(3, -1));
+	cout << ways(n, 0, vals, dp);
+
+
+	// Optimized DP
+	vector<int> dp(n+1, 0);
+	dp[0] = 1;
+	for(int i = 3; i <= n; i++)
+		dp[i] += dp[i - 3];
+	for(int i = 5; i <= n; i++)
+		dp[i] += dp[i - 5];
+	for(int i = 10; i <= n; i++)
+		dp[i] += dp[i - 10];
+
+	cout << dp[n];
 }
 
 int main() {

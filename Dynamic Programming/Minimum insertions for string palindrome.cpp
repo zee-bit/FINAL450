@@ -46,41 +46,34 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int count(int idx, int prod, int &k, vector<int> &arr, vector<vector<int>> &dp) {
-	if(idx == 0) {
-		if(prod * arr[idx] <= k) return 1;
-		return 0;
-	}
-
-	if(dp[idx][prod] != -1)
-		return dp[idx][prod];
-
-	int excl = count(idx - 1, prod, k, arr, dp);
-	int incl = 0;
-	if(prod * arr[idx] <= k)
-		incl = 1 + count(idx - 1, prod * arr[idx], k, arr, dp);
-
-	return dp[idx][prod] = excl + incl;
-}
-
 void solve() {
-	int n, k;
-	cin >> n >> k;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
-
-	vector<vector<int>> dp(n, vector<int>(k+1, -1));
-    cout << count(n-1, 1, k, arr, dp);
+	string A;
+	cin >> A;
+	int n = A.length();
+    string B = A;
+    reverse(A.begin(), A.end());
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    
+    for(int i = 1; i <= n; i++) {
+        for(int j = 1; j <= n; j++) {
+            if(A[i-1] == B[j-1])
+                dp[i][j] = 1 + dp[i-1][j-1];
+            else
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+    
+    cout << n - dp[n][n];
 }
 
 int main() {
 	fast;
 	#ifndef ONLINE_JUDGE
-  		freopen("../input.txt", "r", stdin);
-  		freopen("../output.txt", "w", stdout);
+  		freopen("input.txt", "r", stdin);
+  		freopen("output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	// cin >> t;
+	cin >> t;
 	while(t--)
 		solve();
 	return 0;

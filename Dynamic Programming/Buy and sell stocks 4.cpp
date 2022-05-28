@@ -46,75 +46,50 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int LIS(vector<int> &arr, int idx, int prev, int &n, vector<vector<int>> &dp) {
-	if(idx == n) return 0;
-	if(dp[idx][prev+1] != -1) return dp[idx][prev+1];
-
-	int res = LIS(arr, idx+1, prev, n, dp);
-	if(prev == -1 || arr[idx] > arr[prev])
-		res = max(res, 1 + LIS(arr, idx+1, idx, n, dp));
-	
-	return dp[idx][prev+1] = res;
+int getMaxProfit(int i, int canBuy, int K, vector<int> &A, int dp[][2][201]) {
+    if(K == 0) return 0;
+    if(i == A.size()) return 0;
+    
+    if(dp[i][canBuy][K] != -1) return dp[i][canBuy][K];
+    
+    int profit = INT_MIN;
+    if(canBuy) {
+        profit = max(-A[i] + getMaxProfit(i+1, 1-canBuy, K, A, dp), 0 + getMaxProfit(i+1, canBuy, K, A, dp));
+    }
+    else {
+        profit = max(A[i] + getMaxProfit(i+1, 1-canBuy, K-1, A, dp), 0 + getMaxProfit(i+1, canBuy, K, A, dp));
+    }
+    return dp[i][canBuy][K] = profit;
 }
 
 void solve() {
-	int n;
-	cin >> n;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
+	int N, K;
+	cin >> N >> K;
+	vector<int> prices(N);
+	rep(i, 0, N) cin >> prices[i];
 
-	// Tabulation [O(n^2)]
-	int res = 1;
-	vector<int> dp(n, 1);
-	for(int i = 0; i < n; i++) {
-		for(int j = 0; j < i; j++) {
-			if(arr[i] > arr[j])
-				dp[i] = max(dp[i], 1 + dp[j]);
-		}
-		res = max(res, dp[i]);
+	// MEMOIZATION
+	int dp[N][2][201];
+	memset(dp, -1, sizeof dp);
+	cout << getMaxProfit(0, 1, K, prices, dp);
+
+	// TABULATION
+	int dp[N+1][2][K+1];
+	memset(dp, 0, sizeof dp);
+	for(int i = N-1; i >= 0; i--) {
+	    for(int canBuy = 0; canBuy <= 1; canBuy++) {
+	        for(int k = 1; k <= K; k++) {
+	            int profit = INT_MIN;
+	            if(canBuy) 
+	                profit = max(-prices[i] + dp[i+1][1-canBuy][k], 0 + dp[i+1][canBuy][k]);
+	            else
+	                profit = max(prices[i] + dp[i+1][1-canBuy][k-1], 0 + dp[i+1][canBuy][k]);
+	            
+	            dp[i][canBuy][k] = profit;
+	        }
+	    }
 	}
-	cout << res << "\n";
-
-	// Memoization [O(n^2)]
-	vector<vector<int>> dp(n, vector<int>(n,-1));
-	cout << LIS(arr, 0, -1, n, dp);
-
-	// Using BinarySearch [O(nlogn)]
-	vector<int> res;
-	for(int i = 0; i < res.size(); i++) {
-		int idx = lower_bound(all(res), arr[i]) - res.begin();
-		
-		if(idx == n) res.push_back(arr[i]);
-		else res[idx] = arr[i];
-	}
-	cout << res.size();
-
-
-	// Restoring the SS using Tabulation
-	int res = 1, last_idx = -1;
-	vector<int> dp(n, 1), hash(n);
-	for(int i = 0; i < n; i++) {
-		hash[i] = i;
-		for(int j = 0; j < i; j++) {
-			if(arr[i] > arr[j] && dp[i] < 1 + dp[j]) {
-				dp[i] = 1 + dp[j];
-				hash[i] = j;
-			}
-		}
-		if(dp[i] > res) {
-			res = dp[i];
-			last_idx = i;
-		}
-	}
-	vector<int> lis;
-	lis.push_back(arr[last_idx]);
-	while(hash[last_idx] != last_idx) {
-		last_idx = hash[last_idx];
-		lis.push_back(arr[last_idx]);
-	}
-	reverse(all(lis));
-	for(auto el : lis) cout << el << " ";
-	cout << "\n";
+	cout << dp[0][1][K];
 }
 
 int main() {

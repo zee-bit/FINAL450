@@ -46,75 +46,53 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int LIS(vector<int> &arr, int idx, int prev, int &n, vector<vector<int>> &dp) {
-	if(idx == n) return 0;
-	if(dp[idx][prev+1] != -1) return dp[idx][prev+1];
-
-	int res = LIS(arr, idx+1, prev, n, dp);
-	if(prev == -1 || arr[idx] > arr[prev])
-		res = max(res, 1 + LIS(arr, idx+1, idx, n, dp));
-	
-	return dp[idx][prev+1] = res;
+bool solve(string &a, string &b, string &c, int i, int j, int k, vector<vector<int>> &dp) {
+    if(k == 0)
+        return true;
+    if(dp[i][j] != -1)
+        return dp[i][j];
+    
+    bool ok = false;
+    if(a[i-1] == c[k-1])
+        ok |= solve(a, b, c, i-1, j, k-1, dp);
+    if(b[j-1] == c[k-1])
+        ok |= solve(a, b, c, i, j-1, k-1, dp);
+    
+    return dp[i][j] = ok;
 }
 
 void solve() {
-	int n;
-	cin >> n;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
+	string A, B, C;
+	cin >> A >> B >> C;
 
-	// Tabulation [O(n^2)]
-	int res = 1;
-	vector<int> dp(n, 1);
-	for(int i = 0; i < n; i++) {
-		for(int j = 0; j < i; j++) {
-			if(arr[i] > arr[j])
-				dp[i] = max(dp[i], 1 + dp[j]);
-		}
-		res = max(res, dp[i]);
-	}
-	cout << res << "\n";
+	// MEMOIZATION
+	int m = A.length(), n = B.length(), p = C.length();
+    vector<vector<int>> dp(m+1, vector<int>(n+1, -1));
+    cout << solve(A, B, C, m, n, p, dp);
 
-	// Memoization [O(n^2)]
-	vector<vector<int>> dp(n, vector<int>(n,-1));
-	cout << LIS(arr, 0, -1, n, dp);
+    // TABULATION
+    vector<vector<bool>> dp(m+1, vector<bool>(n+1, false));
+    for(int i = 0; i <= m; i++) {
+    	for(int j = 0; j <= n; j++) {
+    		if(i == 0 || j == 0) {
+    			dp[i][j] = true;
+    		}
+    	}
+    }
 
-	// Using BinarySearch [O(nlogn)]
-	vector<int> res;
-	for(int i = 0; i < res.size(); i++) {
-		int idx = lower_bound(all(res), arr[i]) - res.begin();
-		
-		if(idx == n) res.push_back(arr[i]);
-		else res[idx] = arr[i];
-	}
-	cout << res.size();
+    for(int i = 1; i <= m; i++) {
+    	for(int j = 1; j <= n; j++) {
+    		bool ok = false;
+		    if(a[i-1] == c[i+j-1])
+		        ok |= dp[i-1][j];
+		    if(b[j-1] == c[i+j-1])
+		        ok |= dp[i][j-1];
+		    
+		    dp[i][j] = ok;
+    	}
+    }
 
-
-	// Restoring the SS using Tabulation
-	int res = 1, last_idx = -1;
-	vector<int> dp(n, 1), hash(n);
-	for(int i = 0; i < n; i++) {
-		hash[i] = i;
-		for(int j = 0; j < i; j++) {
-			if(arr[i] > arr[j] && dp[i] < 1 + dp[j]) {
-				dp[i] = 1 + dp[j];
-				hash[i] = j;
-			}
-		}
-		if(dp[i] > res) {
-			res = dp[i];
-			last_idx = i;
-		}
-	}
-	vector<int> lis;
-	lis.push_back(arr[last_idx]);
-	while(hash[last_idx] != last_idx) {
-		last_idx = hash[last_idx];
-		lis.push_back(arr[last_idx]);
-	}
-	reverse(all(lis));
-	for(auto el : lis) cout << el << " ";
-	cout << "\n";
+    cout << dp[m][n];
 }
 
 int main() {

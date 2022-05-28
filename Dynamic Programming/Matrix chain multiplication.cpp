@@ -46,75 +46,43 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int LIS(vector<int> &arr, int idx, int prev, int &n, vector<vector<int>> &dp) {
-	if(idx == n) return 0;
-	if(dp[idx][prev+1] != -1) return dp[idx][prev+1];
+int multiply(int i, int j, vector<int> &arr, vector<vector<int>> &dp) {
+	if(i == j) return 0;
 
-	int res = LIS(arr, idx+1, prev, n, dp);
-	if(prev == -1 || arr[idx] > arr[prev])
-		res = max(res, 1 + LIS(arr, idx+1, idx, n, dp));
-	
-	return dp[idx][prev+1] = res;
+	if(dp[i][j] != -1) return dp[i][j];
+
+	int mn = 1e9;
+	for(int k = i; k < j; k++) {
+		mn = min(
+			mn,
+			(arr[i-1]*arr[k]*arr[j]) + multiply(i, k, arr, dp) + multiply(k+1, j, arr, dp)
+		);
+	}
+	return dp[i][j] = mn;
 }
 
 void solve() {
-	int n;
-	cin >> n;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
+	int N;
+	cin >> N;
+	vector<int> arr(N);
+	rep(i, 0, N) cin >> arr[i];
 
-	// Tabulation [O(n^2)]
-	int res = 1;
-	vector<int> dp(n, 1);
-	for(int i = 0; i < n; i++) {
-		for(int j = 0; j < i; j++) {
-			if(arr[i] > arr[j])
-				dp[i] = max(dp[i], 1 + dp[j]);
-		}
-		res = max(res, dp[i]);
-	}
-	cout << res << "\n";
+	// MEMOIZATION
+	// vector<vector<int>> dp(N, vector<int>(N, -1));
+	// cout << multiply(1, N-1, arr, dp) << "\n";
 
-	// Memoization [O(n^2)]
-	vector<vector<int>> dp(n, vector<int>(n,-1));
-	cout << LIS(arr, 0, -1, n, dp);
-
-	// Using BinarySearch [O(nlogn)]
-	vector<int> res;
-	for(int i = 0; i < res.size(); i++) {
-		int idx = lower_bound(all(res), arr[i]) - res.begin();
-		
-		if(idx == n) res.push_back(arr[i]);
-		else res[idx] = arr[i];
-	}
-	cout << res.size();
-
-
-	// Restoring the SS using Tabulation
-	int res = 1, last_idx = -1;
-	vector<int> dp(n, 1), hash(n);
-	for(int i = 0; i < n; i++) {
-		hash[i] = i;
-		for(int j = 0; j < i; j++) {
-			if(arr[i] > arr[j] && dp[i] < 1 + dp[j]) {
-				dp[i] = 1 + dp[j];
-				hash[i] = j;
+	// TABULATION
+	vector<vector<int>> dp(N, vector<int>(N, 0));
+	for(int i = N-1; i >= 0; i--) {
+		for(int j = i+1; j < N; j++) {
+			int mn = 1e9;
+			for(int k = i; k < j; k++) {
+				mn = min(mn, (arr[i-1]*arr[k]*arr[j]) + dp[i][k] + dp[k+1][j]);
 			}
-		}
-		if(dp[i] > res) {
-			res = dp[i];
-			last_idx = i;
+			dp[i][j] = mn;
 		}
 	}
-	vector<int> lis;
-	lis.push_back(arr[last_idx]);
-	while(hash[last_idx] != last_idx) {
-		last_idx = hash[last_idx];
-		lis.push_back(arr[last_idx]);
-	}
-	reverse(all(lis));
-	for(auto el : lis) cout << el << " ";
-	cout << "\n";
+	cout << dp[1][N-1];
 }
 
 int main() {
@@ -124,7 +92,7 @@ int main() {
   		freopen("../output.txt", "w", stdout);
 	#endif
 	int t = 1;
-	// cin >> t;
+	cin >> t;
 	while(t--)
 		solve();
 	return 0;

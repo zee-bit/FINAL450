@@ -46,75 +46,30 @@ ll powmod(ll x,ll y,ll m){ll r=1;while(y){if(y&1){r=mul(r,x,m);}y>>=1;x=mul(x,x,
 
 //========================================XXXXXXXXXXXXXXXX=======================================
 
-int LIS(vector<int> &arr, int idx, int prev, int &n, vector<vector<int>> &dp) {
-	if(idx == n) return 0;
-	if(dp[idx][prev+1] != -1) return dp[idx][prev+1];
-
-	int res = LIS(arr, idx+1, prev, n, dp);
-	if(prev == -1 || arr[idx] > arr[prev])
-		res = max(res, 1 + LIS(arr, idx+1, idx, n, dp));
-	
-	return dp[idx][prev+1] = res;
-}
-
 void solve() {
-	int n;
-	cin >> n;
-	vector<int> arr(n);
-	rep(i, 0, n) cin >> arr[i];
-
-	// Tabulation [O(n^2)]
-	int res = 1;
-	vector<int> dp(n, 1);
-	for(int i = 0; i < n; i++) {
-		for(int j = 0; j < i; j++) {
-			if(arr[i] > arr[j])
-				dp[i] = max(dp[i], 1 + dp[j]);
-		}
-		res = max(res, dp[i]);
-	}
-	cout << res << "\n";
-
-	// Memoization [O(n^2)]
-	vector<vector<int>> dp(n, vector<int>(n,-1));
-	cout << LIS(arr, 0, -1, n, dp);
-
-	// Using BinarySearch [O(nlogn)]
-	vector<int> res;
-	for(int i = 0; i < res.size(); i++) {
-		int idx = lower_bound(all(res), arr[i]) - res.begin();
-		
-		if(idx == n) res.push_back(arr[i]);
-		else res[idx] = arr[i];
-	}
-	cout << res.size();
-
-
-	// Restoring the SS using Tabulation
-	int res = 1, last_idx = -1;
-	vector<int> dp(n, 1), hash(n);
-	for(int i = 0; i < n; i++) {
-		hash[i] = i;
-		for(int j = 0; j < i; j++) {
-			if(arr[i] > arr[j] && dp[i] < 1 + dp[j]) {
-				dp[i] = 1 + dp[j];
-				hash[i] = j;
-			}
-		}
-		if(dp[i] > res) {
-			res = dp[i];
-			last_idx = i;
+	int n, m;
+	cin >> n >> m;
+	vector<vector<int>> mat(n, vector<int>(m));
+	rep(i, 0, n) {
+		rep(j, 0, m) {
+			cin >> mat[i][j];
 		}
 	}
-	vector<int> lis;
-	lis.push_back(arr[last_idx]);
-	while(hash[last_idx] != last_idx) {
-		last_idx = hash[last_idx];
-		lis.push_back(arr[last_idx]);
-	}
-	reverse(all(lis));
-	for(auto el : lis) cout << el << " ";
-	cout << "\n";
+
+	int mx = 0;
+        
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(mat[i][j] == 1) {
+                int top = i > 0 ? mat[i-1][j] : 0;
+                int dia = (i > 0 && j > 0) ? mat[i-1][j-1] : 0;
+                int left = j > 0 ? mat[i][j-1] : 0;
+                mat[i][j] = 1 + min({top, dia, left});
+                mx = max(mx, mat[i][j]);
+            }
+        }
+    }
+    cout << mx;
 }
 
 int main() {
